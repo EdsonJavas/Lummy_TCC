@@ -12,7 +12,7 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(120), // Altura personalizada da AppBar
+        preferredSize: Size.fromHeight(120),
         child: AppBar(
           flexibleSpace: Container(
             decoration: BoxDecoration(
@@ -31,9 +31,7 @@ class MyHomePage extends StatelessWidget {
             ),
           ),
           title: Padding(
-            padding: const EdgeInsets.only(
-              top: 30,
-            ), // Ajustando a posição do título
+            padding: const EdgeInsets.only(top: 30),
             child: Text(
               title,
               style: GoogleFonts.poppins(
