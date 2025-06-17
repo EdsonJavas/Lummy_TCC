@@ -1,27 +1,24 @@
 // main.dart
 import 'package:flutter/material.dart';
-import 'home_page.dart';
+import 'package:lummy_login/login_page.dart';
 
 void main() {
-  runApp(Lummy());
+  runApp(const LummyApp());
 }
 
-class Lummy extends StatelessWidget {
-  const Lummy({super.key});
+class LummyApp extends StatelessWidget {
+  const LummyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Lummy',
+      title: 'Lummy Login',
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-        textTheme: TextTheme(bodyMedium: TextStyle(fontFamily: 'Poppins')),
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        primarySwatch: Colors.blue,
+        fontFamily: 'Poppins',
       ),
-      debugShowCheckedModeBanner: false, // Removendo o banner de debug
-      home: MyHomePage(
-        title: 'Lummy',
-      ), // Passando o título para a página MyHomePage
+      home: const LoginScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
