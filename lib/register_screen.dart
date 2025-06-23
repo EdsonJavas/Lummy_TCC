@@ -1,33 +1,36 @@
-// login_page.dart
+// register_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'register_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
   bool _isLoading = false;
   bool _emailFocused = false;
   bool _passwordFocused = false;
+  bool _confirmPasswordFocused = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleRegister() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
@@ -41,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Login realizado com sucesso!'),
+          content: const Text('Conta criada com sucesso!'),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -101,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             TextSpan(
                               text: 'Lu',
                               style: GoogleFonts.paytoneOne(
-                                fontSize: isVerySmallScreen ? 28 : 32, // Responsivo
+                                fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
                                 color: Colors.black,
                               ),
@@ -138,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               
-              // Astronauta - totalmente responsivo
+              // Astronauta - mesmo tamanho da tela de login
               Positioned(
                 top: isVerySmallScreen ? screenHeight * 0.08 : screenHeight * 0.10,
                 left: screenWidth * 0.15,
@@ -146,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Center(
                   child: SvgPicture.network(
                     'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/astronauta-lummy-OXK8DpNpgdSxKxNZKtIyQynALBlh6n.svg',
-                    height: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380), // Mais responsivo
+                    height: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380), // Mesmo tamanho do login
                     fit: BoxFit.contain,
                     placeholderBuilder: (context) => Container(
                       height: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
@@ -165,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               
-              // Formulário na parte inferior - totalmente responsivo
+              // Formulário na parte inferior - ajustado para não empurrar o astronauta
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -174,8 +177,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   clipper: FormTopClipper(),
                   child: Container(
                     constraints: BoxConstraints(
-                      minHeight: isVerySmallScreen ? screenHeight * 0.55 : screenHeight * 0.5,
-                      maxHeight: isVerySmallScreen ? screenHeight * 0.75 : screenHeight * 0.7,
+                      minHeight: isVerySmallScreen ? screenHeight * 0.6 : screenHeight * 0.55,
+                      maxHeight: isVerySmallScreen ? screenHeight * 0.8 : screenHeight * 0.75,
                     ),
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -190,7 +193,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: SingleChildScrollView(
                       padding: EdgeInsets.only(
-                        left: isVerySmallScreen ? 20.0 : 24.0, // Menos padding em telas pequenas
+                        left: isVerySmallScreen ? 20.0 : 24.0,
                         right: isVerySmallScreen ? 20.0 : 24.0,
                         top: isVerySmallScreen ? 20.0 : 24.0,
                         bottom: (isVerySmallScreen ? 20.0 : 24.0) + keyboardHeight,
@@ -201,21 +204,21 @@ class _LoginScreenState extends State<LoginScreen> {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(height: isVerySmallScreen ? 20 : (isSmallScreen ? 30 : 50)), // Responsivo
+                            SizedBox(height: isVerySmallScreen ? 15 : (isSmallScreen ? 25 : 35)),
                             
-                            // Título "Faça Login" - responsivo
+                            // Título "Crie sua conta" - responsivo
                             Text(
-                              'Faça Login',
+                              'Crie sua conta',
                               style: GoogleFonts.inter(
-                                fontSize: isVerySmallScreen ? 24 : 28, // Menor em telas pequenas
+                                fontSize: isVerySmallScreen ? 24 : 28,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black,
                               ),
                             ),
                             
-                            SizedBox(height: isVerySmallScreen ? 20 : 30), // Responsivo
+                            SizedBox(height: isVerySmallScreen ? 15 : 20),
                             
-                            // Campo Email estilizado
+                            // Campo E-mail do responsável
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               decoration: BoxDecoration(
@@ -253,12 +256,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                   controller: _emailController,
                                   keyboardType: TextInputType.emailAddress,
                                   style: GoogleFonts.poppins(
-                                    fontSize: isVerySmallScreen ? 14 : 16, // Responsivo
+                                    fontSize: isVerySmallScreen ? 14 : 16,
                                     color: Colors.black87,
                                     fontWeight: FontWeight.w500,
                                   ),
                                   decoration: InputDecoration(
-                                    hintText: 'Seu E-mail',
+                                    hintText: 'E-mail do responsável',
                                     hintStyle: GoogleFonts.poppins(
                                       color: Colors.grey[500],
                                       fontSize: isVerySmallScreen ? 14 : 16,
@@ -269,7 +272,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       color: _emailFocused 
                                         ? const Color(0xFF4A90E2)
                                         : Colors.grey[500],
-                                      size: isVerySmallScreen ? 20 : 22, // Responsivo
+                                      size: isVerySmallScreen ? 20 : 22,
                                     ),
                                     border: InputBorder.none,
                                     contentPadding: EdgeInsets.symmetric(
@@ -282,7 +285,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Por favor, insira seu e-mail';
+                                      return 'Por favor, insira o e-mail do responsável';
                                     }
                                     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                                         .hasMatch(value)) {
@@ -294,9 +297,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             
-                            SizedBox(height: isVerySmallScreen ? 12 : 16), // Responsivo
+                            SizedBox(height: isVerySmallScreen ? 10 : 14),
                             
-                            // Campo Senha estilizado
+                            // Campo Senha
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               decoration: BoxDecoration(
@@ -390,12 +393,108 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             
-                            SizedBox(height: isVerySmallScreen ? 20 : 30), // Responsivo
+                            SizedBox(height: isVerySmallScreen ? 10 : 14),
                             
-                            // Botão Login com gradiente
+                            // Campo Confirmar Senha
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8F9FA),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _confirmPasswordFocused 
+                                    ? const Color(0xFF4A90E2)
+                                    : Colors.transparent,
+                                  width: 2,
+                                ),
+                                boxShadow: _confirmPasswordFocused 
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(0xFF4A90E2).withOpacity(0.1),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                  : [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.05),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                              ),
+                              child: Focus(
+                                onFocusChange: (hasFocus) {
+                                  setState(() {
+                                    _confirmPasswordFocused = hasFocus;
+                                  });
+                                },
+                                child: TextFormField(
+                                  controller: _confirmPasswordController,
+                                  obscureText: !_isConfirmPasswordVisible,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: isVerySmallScreen ? 14 : 16,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintText: 'Confirme sua Senha',
+                                    hintStyle: GoogleFonts.poppins(
+                                      color: Colors.grey[500],
+                                      fontSize: isVerySmallScreen ? 14 : 16,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    prefixIcon: Icon(
+                                      Icons.lock_outline,
+                                      color: _confirmPasswordFocused 
+                                        ? const Color(0xFF4A90E2)
+                                        : Colors.grey[500],
+                                      size: isVerySmallScreen ? 20 : 22,
+                                    ),
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: isVerySmallScreen ? 16 : 20,
+                                      vertical: isVerySmallScreen ? 14 : 18,
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _isConfirmPasswordVisible
+                                            ? Icons.visibility_outlined
+                                            : Icons.visibility_off_outlined,
+                                        color: _confirmPasswordFocused 
+                                          ? const Color(0xFF4A90E2)
+                                          : Colors.grey[500],
+                                        size: isVerySmallScreen ? 20 : 22,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                                        });
+                                      },
+                                    ),
+                                    errorStyle: GoogleFonts.poppins(
+                                      fontSize: isVerySmallScreen ? 10 : 12,
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Por favor, confirme sua senha';
+                                    }
+                                    if (value != _passwordController.text) {
+                                      return 'As senhas não coincidem';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ),
+                            
+                            SizedBox(height: isVerySmallScreen ? 15 : 20),
+                            
+                            // Botão Avançar com gradiente
                             Container(
                               width: double.infinity,
-                              height: isVerySmallScreen ? 50 : 56, // Responsivo
+                              height: isVerySmallScreen ? 50 : 56,
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
                                   colors: [
@@ -413,7 +512,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ],
                               ),
                               child: ElevatedButton(
-                                onPressed: _isLoading ? null : _handleLogin,
+                                onPressed: _isLoading ? null : _handleRegister,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.transparent,
                                   foregroundColor: Colors.white,
@@ -435,7 +534,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                       )
                                     : Text(
-                                        'Login',
+                                        'Avançar',
                                         style: GoogleFonts.poppins(
                                           fontSize: isVerySmallScreen ? 16 : 18,
                                           fontWeight: FontWeight.w600,
@@ -444,24 +543,19 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             
-                            SizedBox(height: isVerySmallScreen ? 20 : 30), // Responsivo
+                            SizedBox(height: isVerySmallScreen ? 15 : 20),
                             
-                            // Link para criar conta - com navegação
+                            // Link para fazer login
                             Center(
                               child: GestureDetector(
                                 onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const RegisterScreen(),
-                                    ),
-                                  );
+                                  Navigator.pop(context);
                                 },
                                 child: RichText(
                                   text: TextSpan(
                                     children: [
                                       TextSpan(
-                                        text: 'Ainda não tem uma conta? ',
+                                        text: 'Já tem uma conta Lummy? ',
                                         style: GoogleFonts.poppins(
                                           color: const Color(0xFF9E9E9E),
                                           fontSize: isVerySmallScreen ? 12 : 14,
@@ -469,7 +563,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                       ),
                                       TextSpan(
-                                        text: 'Crie uma conta',
+                                        text: 'Faça Login',
                                         style: GoogleFonts.poppins(
                                           color: const Color(0xFF003092),
                                           fontSize: isVerySmallScreen ? 12 : 14,
@@ -482,7 +576,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             
-                            SizedBox(height: isVerySmallScreen ? 15 : 20), // Responsivo
+                            SizedBox(height: isVerySmallScreen ? 15 : 20),
                           ],
                         ),
                       ),
@@ -498,33 +592,26 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-// Classe personalizada para criar a curva na parte superior do formulário
+// Reutilizando a mesma classe do login
 class FormTopClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
     
-    // Começar do canto inferior esquerdo
     path.moveTo(0, size.height);
-    
-    // Linha para o canto inferior direito
     path.lineTo(size.width, size.height);
-    
-    // Linha para o canto superior direito (mas um pouco abaixo para criar a curva)
     path.lineTo(size.width, 60);
     
-    // Criar uma curva suave na parte superior
     path.quadraticBezierTo(
-      size.width * 0.75, 20,  // Ponto de controle
-      size.width * 0.5, 20,   // Ponto médio
+      size.width * 0.75, 20,
+      size.width * 0.5, 20,
     );
     
     path.quadraticBezierTo(
-      size.width * 0.25, 20,  // Ponto de controle
-      0, 60,                  // Ponto final
+      size.width * 0.25, 20,
+      0, 60,
     );
     
-    // Fechar o caminho
     path.close();
     
     return path;
