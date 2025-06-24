@@ -1,33 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'register_screen.dart';
-import 'profile_setup_screen.dart'; // Importar a nova tela
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class ProfileSetupScreen extends StatefulWidget {
+  const ProfileSetupScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _ageController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _isLoading = false;
-  bool _emailFocused = false;
+  bool _nameFocused = false;
+  bool _ageFocused = false;
   bool _passwordFocused = false;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _nameController.dispose();
+    _ageController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleProfileSetup() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
@@ -39,14 +40,26 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = false;
       });
 
-      // Navegar para a tela de configuração de perfil após login bem-sucedido
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const ProfileSetupScreen(),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Perfil configurado com sucesso!'),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
     }
+  }
+
+  void _selectProfileImage() {
+    // Aqui você implementaria a seleção de imagem
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Funcionalidade de seleção de foto em desenvolvimento'),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
 
   @override
@@ -85,86 +98,100 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               
-              // Logo no topo - usando Google Fonts
-              SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: 24.0, 
-                    top: isVerySmallScreen ? 10 : 20, // Reduzido de 30
-                  ),
-                  child: Row(
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Lu',
-                              style: GoogleFonts.paytoneOne(
-                                fontSize: isVerySmallScreen ? 28 : 32,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.black,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'm',
-                              style: GoogleFonts.paytoneOne(
-                                fontSize: isVerySmallScreen ? 28 : 32,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.orange,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'm',
-                              style: GoogleFonts.paytoneOne(
-                                fontSize: isVerySmallScreen ? 28 : 32,
-                                fontWeight: FontWeight.w400,
-                                color: const Color(0xFF003092),
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'y',
-                              style: GoogleFonts.paytoneOne(
-                                fontSize: isVerySmallScreen ? 28 : 32,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              
-              // Astronauta - totalmente responsivo
+              // Astronauta no canto superior direito
               Positioned(
-                top: isVerySmallScreen ? screenHeight * 0.08 : screenHeight * 0.10,
-                left: screenWidth * 0.15,
-                right: screenWidth * 0.05,
-                child: Center(
-                  child: SvgPicture.network(
-                    'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/astronauta-lummy-OXK8DpNpgdSxKxNZKtIyQynALBlh6n.svg',
-                    height: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380), // Mais responsivo
-                    fit: BoxFit.contain,
-                    placeholderBuilder: (context) => Container(
-                      height: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
-                      width: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(isVerySmallScreen ? 125 : (isSmallScreen ? 150 : 190)),
-                      ),
-                      child: Icon(
-                        Icons.person,
-                        size: isVerySmallScreen ? 100 : (isSmallScreen ? 120 : 180),
-                        color: Colors.white,
-                      ),
+                top: isVerySmallScreen ? 40 : 60,
+                right: isVerySmallScreen ? 10 : 20,
+                child: SvgPicture.network(
+                  'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/astronauta-lummy-OXK8DpNpgdSxKxNZKtIyQynALBlh6n.svg',
+                  height: isVerySmallScreen ? 120 : 150,
+                  fit: BoxFit.contain,
+                  placeholderBuilder: (context) => Container(
+                    height: isVerySmallScreen ? 120 : 150,
+                    width: isVerySmallScreen ? 120 : 150,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(isVerySmallScreen ? 60 : 75),
+                    ),
+                    child: Icon(
+                      Icons.person,
+                      size: isVerySmallScreen ? 60 : 75,
+                      color: Colors.white,
                     ),
                   ),
                 ),
               ),
               
-              // Formulário na parte inferior - totalmente responsivo
+              // Foto de perfil no centro superior
+              Positioned(
+                top: isVerySmallScreen ? screenHeight * 0.12 : screenHeight * 0.15,
+                left: screenWidth * 0.5 - (isVerySmallScreen ? 60 : 75), // Centralizado
+                child: Stack(
+                  children: [
+                    // Container da foto de perfil
+                    Container(
+                      width: isVerySmallScreen ? 120 : 150,
+                      height: isVerySmallScreen ? 120 : 150,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: const Color(0xFF003092),
+                          width: 4,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: ClipOval(
+                        child: Container(
+                          color: const Color(0xFFF5F5F5),
+                          child: Icon(
+                            Icons.person,
+                            size: isVerySmallScreen ? 60 : 75,
+                            color: const Color(0xFFBDBDBD),
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    // Botão de editar foto
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: _selectProfileImage,
+                        child: Container(
+                          width: isVerySmallScreen ? 35 : 40,
+                          height: isVerySmallScreen ? 35 : 40,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF4CAF50),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                            size: isVerySmallScreen ? 18 : 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Formulário na parte inferior
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -189,7 +216,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: SingleChildScrollView(
                       padding: EdgeInsets.only(
-                        left: isVerySmallScreen ? 20.0 : 24.0, // Menos padding em telas pequenas
+                        left: isVerySmallScreen ? 20.0 : 24.0,
                         right: isVerySmallScreen ? 20.0 : 24.0,
                         top: isVerySmallScreen ? 20.0 : 24.0,
                         bottom: (isVerySmallScreen ? 20.0 : 24.0) + keyboardHeight,
@@ -200,33 +227,73 @@ class _LoginScreenState extends State<LoginScreen> {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(height: isVerySmallScreen ? 20 : (isSmallScreen ? 30 : 50)), // Responsivo
+                            SizedBox(height: isVerySmallScreen ? 20 : (isSmallScreen ? 30 : 50)),
                             
-                            // Título "Faça Login" - responsivo
-                            Text(
-                              'Faça Login',
-                              style: GoogleFonts.inter(
-                                fontSize: isVerySmallScreen ? 24 : 28, // Menor em telas pequenas
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
+                            // Título "Seja Lummy" - com as cores da logo
+                            Center(
+                              child: RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: 'Seja ',
+                                      style: GoogleFonts.inter(
+                                        fontSize: isVerySmallScreen ? 24 : 28,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: 'Lu',
+                                      style: GoogleFonts.paytoneOne(
+                                        fontSize: isVerySmallScreen ? 24 : 28,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: 'm',
+                                      style: GoogleFonts.paytoneOne(
+                                        fontSize: isVerySmallScreen ? 24 : 28,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.orange,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: 'm',
+                                      style: GoogleFonts.paytoneOne(
+                                        fontSize: isVerySmallScreen ? 24 : 28,
+                                        fontWeight: FontWeight.w400,
+                                        color: const Color(0xFF003092),
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: 'y',
+                                      style: GoogleFonts.paytoneOne(
+                                        fontSize: isVerySmallScreen ? 24 : 28,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                             
-                            SizedBox(height: isVerySmallScreen ? 20 : 30), // Responsivo
+                            SizedBox(height: isVerySmallScreen ? 20 : 30),
                             
-                            // Campo Email estilizado
+                            // Campo Nome
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFF8F9FA),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: _emailFocused 
+                                  color: _nameFocused 
                                     ? const Color(0xFF4A90E2)
                                     : Colors.transparent,
                                   width: 2,
                                 ),
-                                boxShadow: _emailFocused 
+                                boxShadow: _nameFocused 
                                   ? [
                                       BoxShadow(
                                         color: const Color(0xFF4A90E2).withOpacity(0.1),
@@ -245,30 +312,31 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: Focus(
                                 onFocusChange: (hasFocus) {
                                   setState(() {
-                                    _emailFocused = hasFocus;
+                                    _nameFocused = hasFocus;
                                   });
                                 },
                                 child: TextFormField(
-                                  controller: _emailController,
-                                  keyboardType: TextInputType.emailAddress,
+                                  controller: _nameController,
+                                  keyboardType: TextInputType.name,
+                                  textCapitalization: TextCapitalization.words,
                                   style: GoogleFonts.poppins(
-                                    fontSize: isVerySmallScreen ? 14 : 16, // Responsivo
+                                    fontSize: isVerySmallScreen ? 14 : 16,
                                     color: Colors.black87,
                                     fontWeight: FontWeight.w500,
                                   ),
                                   decoration: InputDecoration(
-                                    hintText: 'Seu E-mail',
+                                    hintText: 'Digite seu nome',
                                     hintStyle: GoogleFonts.poppins(
                                       color: Colors.grey[500],
                                       fontSize: isVerySmallScreen ? 14 : 16,
                                       fontWeight: FontWeight.w400,
                                     ),
                                     prefixIcon: Icon(
-                                      Icons.email_outlined,
-                                      color: _emailFocused 
+                                      Icons.person_outline,
+                                      color: _nameFocused 
                                         ? const Color(0xFF4A90E2)
                                         : Colors.grey[500],
-                                      size: isVerySmallScreen ? 20 : 22, // Responsivo
+                                      size: isVerySmallScreen ? 20 : 22,
                                     ),
                                     border: InputBorder.none,
                                     contentPadding: EdgeInsets.symmetric(
@@ -281,11 +349,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Por favor, insira seu e-mail';
+                                      return 'Por favor, digite seu nome';
                                     }
-                                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                        .hasMatch(value)) {
-                                      return 'Por favor, insira um e-mail válido';
+                                    if (value.length < 2) {
+                                      return 'Nome deve ter pelo menos 2 caracteres';
                                     }
                                     return null;
                                   },
@@ -293,9 +360,90 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             
-                            SizedBox(height: isVerySmallScreen ? 12 : 16), // Responsivo
+                            SizedBox(height: isVerySmallScreen ? 12 : 16),
                             
-                            // Campo Senha estilizado
+                            // Campo Idade
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8F9FA),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _ageFocused 
+                                    ? const Color(0xFF4A90E2)
+                                    : Colors.transparent,
+                                  width: 2,
+                                ),
+                                boxShadow: _ageFocused 
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(0xFF4A90E2).withOpacity(0.1),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                  : [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.05),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                              ),
+                              child: Focus(
+                                onFocusChange: (hasFocus) {
+                                  setState(() {
+                                    _ageFocused = hasFocus;
+                                  });
+                                },
+                                child: TextFormField(
+                                  controller: _ageController,
+                                  keyboardType: TextInputType.number,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: isVerySmallScreen ? 14 : 16,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintText: 'Qual sua idade?',
+                                    hintStyle: GoogleFonts.poppins(
+                                      color: Colors.grey[500],
+                                      fontSize: isVerySmallScreen ? 14 : 16,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    prefixIcon: Icon(
+                                      Icons.cake_outlined,
+                                      color: _ageFocused 
+                                        ? const Color(0xFF4A90E2)
+                                        : Colors.grey[500],
+                                      size: isVerySmallScreen ? 20 : 22,
+                                    ),
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: isVerySmallScreen ? 16 : 20,
+                                      vertical: isVerySmallScreen ? 14 : 18,
+                                    ),
+                                    errorStyle: GoogleFonts.poppins(
+                                      fontSize: isVerySmallScreen ? 10 : 12,
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Por favor, digite sua idade';
+                                    }
+                                    final age = int.tryParse(value);
+                                    if (age == null || age < 1 || age > 120) {
+                                      return 'Por favor, digite uma idade válida';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ),
+                            
+                            SizedBox(height: isVerySmallScreen ? 12 : 16),
+                            
+                            // Campo Senha
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               decoration: BoxDecoration(
@@ -378,7 +526,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Por favor, insira sua senha';
+                                      return 'Por favor, digite sua senha';
                                     }
                                     if (value.length < 6) {
                                       return 'A senha deve ter pelo menos 6 caracteres';
@@ -389,12 +537,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             
-                            SizedBox(height: isVerySmallScreen ? 20 : 30), // Responsivo
+                            SizedBox(height: isVerySmallScreen ? 20 : 30),
                             
-                            // Botão Login com gradiente
+                            // Botão Avançar
                             Container(
                               width: double.infinity,
-                              height: isVerySmallScreen ? 50 : 56, // Responsivo
+                              height: isVerySmallScreen ? 50 : 56,
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
                                   colors: [
@@ -412,7 +560,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ],
                               ),
                               child: ElevatedButton(
-                                onPressed: _isLoading ? null : _handleLogin,
+                                onPressed: _isLoading ? null : _handleProfileSetup,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.transparent,
                                   foregroundColor: Colors.white,
@@ -434,7 +582,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                       )
                                     : Text(
-                                        'Login',
+                                        'Avançar',
                                         style: GoogleFonts.poppins(
                                           fontSize: isVerySmallScreen ? 16 : 18,
                                           fontWeight: FontWeight.w600,
@@ -443,45 +591,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             
-                            SizedBox(height: isVerySmallScreen ? 20 : 30), // Responsivo
-                            
-                            // Link para criar conta - com navegação
-                            Center(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const RegisterScreen(),
-                                    ),
-                                  );
-                                },
-                                child: RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: 'Ainda não tem uma conta? ',
-                                        style: GoogleFonts.poppins(
-                                          color: const Color(0xFF9E9E9E),
-                                          fontSize: isVerySmallScreen ? 12 : 14,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: 'Crie uma conta',
-                                        style: GoogleFonts.poppins(
-                                          color: const Color(0xFF003092),
-                                          fontSize: isVerySmallScreen ? 12 : 14,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            
-                            SizedBox(height: isVerySmallScreen ? 15 : 20), // Responsivo
+                            SizedBox(height: isVerySmallScreen ? 15 : 20),
                           ],
                         ),
                       ),
@@ -497,33 +607,26 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-// Classe personalizada para criar a curva na parte superior do formulário
+// Reutilizando a mesma classe das outras telas
 class FormTopClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
     
-    // Começar do canto inferior esquerdo
     path.moveTo(0, size.height);
-    
-    // Linha para o canto inferior direito
     path.lineTo(size.width, size.height);
-    
-    // Linha para o canto superior direito (mas um pouco abaixo para criar a curva)
     path.lineTo(size.width, 60);
     
-    // Criar uma curva suave na parte superior
     path.quadraticBezierTo(
-      size.width * 0.75, 20,  // Ponto de controle
-      size.width * 0.5, 20,   // Ponto médio
+      size.width * 0.75, 20,
+      size.width * 0.5, 20,
     );
     
     path.quadraticBezierTo(
-      size.width * 0.25, 20,  // Ponto de controle
-      0, 60,                  // Ponto final
+      size.width * 0.25, 20,
+      0, 60,
     );
     
-    // Fechar o caminho
     path.close();
     
     return path;
