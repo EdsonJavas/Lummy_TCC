@@ -98,34 +98,37 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                 ),
               ),
               
-              // Astronauta no canto superior direito
+              // Astronauta "segurando" na borda da tela - GIRADO
               Positioned(
-                top: isVerySmallScreen ? 40 : 60,
-                right: isVerySmallScreen ? 10 : 20,
-                child: SvgPicture.network(
-                  'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/astronauta-lummy-OXK8DpNpgdSxKxNZKtIyQynALBlh6n.svg',
-                  height: isVerySmallScreen ? 120 : 150,
-                  fit: BoxFit.contain,
-                  placeholderBuilder: (context) => Container(
-                    height: isVerySmallScreen ? 120 : 150,
-                    width: isVerySmallScreen ? 120 : 150,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(isVerySmallScreen ? 60 : 75),
-                    ),
-                    child: Icon(
-                      Icons.person,
-                      size: isVerySmallScreen ? 60 : 75,
-                      color: Colors.white,
+                top: isVerySmallScreen ? 20 : 40,
+                right: isVerySmallScreen ? -60 : -80, // Bem na borda da tela
+                child: Transform.rotate(
+                  angle: -0.3, // Rotação para parecer que está segurando na borda
+                  child: SvgPicture.network(
+                    'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Design%20sem%20nome%20%281%29-3cva84Hcw1yVzTEgDHAc16jDZNkolI.svg',
+                    height: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
+                    fit: BoxFit.contain,
+                    placeholderBuilder: (context) => Container(
+                      height: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
+                      width: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(isVerySmallScreen ? 125 : (isSmallScreen ? 150 : 190)),
+                      ),
+                      child: Icon(
+                        Icons.person,
+                        size: isVerySmallScreen ? 100 : (isSmallScreen ? 120 : 180),
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
               ),
-              
-              // Foto de perfil no centro superior
+
+              // Foto de perfil no centro superior - MOVIDA PARA A ESQUERDA
               Positioned(
                 top: isVerySmallScreen ? screenHeight * 0.12 : screenHeight * 0.15,
-                left: screenWidth * 0.5 - (isVerySmallScreen ? 60 : 75), // Centralizado
+                left: screenWidth * 0.25 - (isVerySmallScreen ? 60 : 75), // Mais para a esquerda
                 child: Stack(
                   children: [
                     // Container da foto de perfil
@@ -362,7 +365,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                             
                             SizedBox(height: isVerySmallScreen ? 12 : 16),
                             
-                            // Campo Idade
+                            // Campo "Quem você é!"
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               decoration: BoxDecoration(
@@ -398,21 +401,21 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                 },
                                 child: TextFormField(
                                   controller: _ageController,
-                                  keyboardType: TextInputType.number,
+                                  keyboardType: TextInputType.text,
                                   style: GoogleFonts.poppins(
                                     fontSize: isVerySmallScreen ? 14 : 16,
                                     color: Colors.black87,
                                     fontWeight: FontWeight.w500,
                                   ),
                                   decoration: InputDecoration(
-                                    hintText: 'Qual sua idade?',
+                                    hintText: 'Quem você é!',
                                     hintStyle: GoogleFonts.poppins(
                                       color: Colors.grey[500],
                                       fontSize: isVerySmallScreen ? 14 : 16,
                                       fontWeight: FontWeight.w400,
                                     ),
                                     prefixIcon: Icon(
-                                      Icons.cake_outlined,
+                                      Icons.psychology_outlined,
                                       color: _ageFocused 
                                         ? const Color(0xFF4A90E2)
                                         : Colors.grey[500],
@@ -429,11 +432,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Por favor, digite sua idade';
-                                    }
-                                    final age = int.tryParse(value);
-                                    if (age == null || age < 1 || age > 120) {
-                                      return 'Por favor, digite uma idade válida';
+                                      return 'Por favor, digite quem você é';
                                     }
                                     return null;
                                   },
