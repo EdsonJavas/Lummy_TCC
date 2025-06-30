@@ -1,3 +1,4 @@
+// profile_setup_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -33,13 +34,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       setState(() {
         _isLoading = true;
       });
-
       await Future.delayed(const Duration(seconds: 2));
-
       setState(() {
         _isLoading = false;
       });
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Perfil configurado com sucesso!'),
@@ -52,7 +50,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   }
 
   void _selectProfileImage() {
-    // Aqui você implementaria a seleção de imagem
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Funcionalidade de seleção de foto em desenvolvimento'),
@@ -68,10 +65,26 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     
-    // Responsividade para telas muito pequenas
+    // Sistema de responsividade
+    final isExtraSmallScreen = screenHeight < 600;
     final isVerySmallScreen = screenHeight < 650;
     final isSmallScreen = screenHeight < 700;
+    final isMediumScreen = screenHeight < 800;
     
+    // Tamanhos adaptativos
+    final astronautSize = isExtraSmallScreen ? 350.0 : 
+                         isVerySmallScreen ? 420.0 : 
+                         isSmallScreen ? 480.0 : 
+                         isMediumScreen ? 550.0 : 600.0;
+    
+    final profileImageSize = isExtraSmallScreen ? 100.0 : 
+                            isVerySmallScreen ? 120.0 : 
+                            isSmallScreen ? 140.0 : 160.0;
+    
+    final formHeightRatio = isExtraSmallScreen ? 0.65 : 
+                           isVerySmallScreen ? 0.60 : 
+                           isSmallScreen ? 0.55 : 0.50;
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
@@ -82,110 +95,156 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
           ),
           child: Stack(
             children: [
-              // Fundo azul ocupando toda a tela
+              // Fundo azul com gradiente
               Container(
                 width: double.infinity,
                 height: screenHeight,
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                     colors: [
                       Color(0xFF4A90E2),
                       Color(0xFF357ABD),
+                      Color(0xFF2E5F8F),
                     ],
+                    stops: [0.0, 0.6, 1.0],
                   ),
                 ),
               ),
               
-              // Astronauta "segurando" na borda da tela - GIRADO
+              // Astronauta na posição original
               Positioned(
-                top: isVerySmallScreen ? 20 : 40,
-                right: isVerySmallScreen ? -60 : -80, // Bem na borda da tela
+                top: isExtraSmallScreen ? -20 : 
+                     isVerySmallScreen ? -10 : 
+                     isSmallScreen ? 10 : 30,
+                right: isExtraSmallScreen ? -100 : 
+                       isVerySmallScreen ? -120 : 
+                       isSmallScreen ? -140 : -160,
                 child: Transform.rotate(
-                  angle: -0.3, // Rotação para parecer que está segurando na borda
+                  angle: -0.2,
                   child: SvgPicture.network(
                     'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Design%20sem%20nome%20%281%29-3cva84Hcw1yVzTEgDHAc16jDZNkolI.svg',
-                    height: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
+                    height: astronautSize,
+                    width: astronautSize,
                     fit: BoxFit.contain,
                     placeholderBuilder: (context) => Container(
-                      height: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
-                      width: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
+                      height: astronautSize,
+                      width: astronautSize,
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(isVerySmallScreen ? 125 : (isSmallScreen ? 150 : 190)),
+                        borderRadius: BorderRadius.circular(astronautSize / 2),
                       ),
                       child: Icon(
                         Icons.person,
-                        size: isVerySmallScreen ? 100 : (isSmallScreen ? 120 : 180),
-                        color: Colors.white,
+                        size: astronautSize * 0.4,
+                        color: Colors.white.withOpacity(0.7),
                       ),
                     ),
                   ),
                 ),
               ),
-
-              // Foto de perfil no centro superior - MOVIDA PARA A ESQUERDA
+              
+              // Campo de foto MINIMALISTA
               Positioned(
-                top: isVerySmallScreen ? screenHeight * 0.12 : screenHeight * 0.15,
-                left: screenWidth * 0.25 - (isVerySmallScreen ? 60 : 75), // Mais para a esquerda
+                top: isExtraSmallScreen ? screenHeight * 0.12 : 
+                     isVerySmallScreen ? screenHeight * 0.14 : 
+                     isSmallScreen ? screenHeight * 0.16 : 
+                     screenHeight * 0.18,
+                left: screenWidth * 0.08,
                 child: Stack(
                   children: [
-                    // Container da foto de perfil
+                    // Container principal minimalista
                     Container(
-                      width: isVerySmallScreen ? 120 : 150,
-                      height: isVerySmallScreen ? 120 : 150,
+                      width: profileImageSize,
+                      height: profileImageSize,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: const Color(0xFF003092),
-                          width: 4,
+                          color: const Color(0xFF4A90E2),
+                          width: isExtraSmallScreen ? 2 : 3,
                         ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                          ),
+                          BoxShadow(
+                            color: const Color(0xFF4A90E2).withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 4),
                           ),
                         ],
                       ),
                       child: ClipOval(
                         child: Container(
-                          color: const Color(0xFFF5F5F5),
-                          child: Icon(
-                            Icons.person,
-                            size: isVerySmallScreen ? 60 : 75,
-                            color: const Color(0xFFBDBDBD),
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Color(0xFFF8FBFF),
+                                Color(0xFFEDF4FF),
+                              ],
+                            ),
+                          ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // Ícone minimalista
+                              Icon(
+                                Icons.add_a_photo_outlined,
+                                size: profileImageSize * 0.3,
+                                color: const Color(0xFF4A90E2).withOpacity(0.6),
+                              ),
+                              // Texto sutil
+                              Positioned(
+                                bottom: profileImageSize * 0.2,
+                                child: Text(
+                                  'Adicionar foto',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: isExtraSmallScreen ? 8 : 10,
+                                    fontWeight: FontWeight.w500,
+                                    color: const Color(0xFF4A90E2).withOpacity(0.7),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ),
                     
-                    // Botão de editar foto
+                    // Botão de adicionar minimalista
                     Positioned(
                       bottom: 0,
                       right: 0,
                       child: GestureDetector(
                         onTap: _selectProfileImage,
                         child: Container(
-                          width: isVerySmallScreen ? 35 : 40,
-                          height: isVerySmallScreen ? 35 : 40,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF4CAF50),
+                          width: isExtraSmallScreen ? 32 : 36,
+                          height: isExtraSmallScreen ? 32 : 36,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4A90E2),
                             shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 2,
+                            ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 4,
-                                offset: Offset(0, 2),
+                                color: const Color(0xFF4A90E2).withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
                               ),
                             ],
                           ),
                           child: Icon(
-                            Icons.edit,
+                            Icons.add,
                             color: Colors.white,
-                            size: isVerySmallScreen ? 18 : 20,
+                            size: isExtraSmallScreen ? 16 : 18,
                           ),
                         ),
                       ),
@@ -194,7 +253,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                 ),
               ),
               
-              // Formulário na parte inferior
+              // Formulário
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -203,8 +262,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   clipper: FormTopClipper(),
                   child: Container(
                     constraints: BoxConstraints(
-                      minHeight: isVerySmallScreen ? screenHeight * 0.55 : screenHeight * 0.5,
-                      maxHeight: isVerySmallScreen ? screenHeight * 0.75 : screenHeight * 0.7,
+                      minHeight: screenHeight * formHeightRatio,
+                      maxHeight: screenHeight * (formHeightRatio + 0.15),
                     ),
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -212,17 +271,17 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, -5),
+                          blurRadius: 25,
+                          offset: const Offset(0, -10),
                         ),
                       ],
                     ),
                     child: SingleChildScrollView(
                       padding: EdgeInsets.only(
-                        left: isVerySmallScreen ? 20.0 : 24.0,
-                        right: isVerySmallScreen ? 20.0 : 24.0,
-                        top: isVerySmallScreen ? 20.0 : 24.0,
-                        bottom: (isVerySmallScreen ? 20.0 : 24.0) + keyboardHeight,
+                        left: isExtraSmallScreen ? 16.0 : 20.0,
+                        right: isExtraSmallScreen ? 16.0 : 20.0,
+                        top: isExtraSmallScreen ? 16.0 : 20.0,
+                        bottom: (isExtraSmallScreen ? 16.0 : 20.0) + keyboardHeight,
                       ),
                       child: Form(
                         key: _formKey,
@@ -230,318 +289,145 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(height: isVerySmallScreen ? 20 : (isSmallScreen ? 30 : 50)),
+                            SizedBox(height: isExtraSmallScreen ? 15 : 
+                                             isVerySmallScreen ? 20 : 
+                                             isSmallScreen ? 25 : 35),
                             
-                            // Título "Seja Lummy" - com as cores da logo
+                            // Título "Seja Lummy"
                             Center(
-                              child: RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: 'Seja ',
-                                      style: GoogleFonts.inter(
-                                        fontSize: isVerySmallScreen ? 24 : 28,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black,
-                                      ),
+                              child: Column(
+                                children: [
+                                  RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Seja ',
+                                          style: GoogleFonts.inter(
+                                            fontSize: isExtraSmallScreen ? 22 : 
+                                                     isVerySmallScreen ? 24 : 26,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: 'Lu',
+                                          style: GoogleFonts.paytoneOne(
+                                            fontSize: isExtraSmallScreen ? 22 : 
+                                                     isVerySmallScreen ? 24 : 26,
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: 'm',
+                                          style: GoogleFonts.paytoneOne(
+                                            fontSize: isExtraSmallScreen ? 22 : 
+                                                     isVerySmallScreen ? 24 : 26,
+                                            fontWeight: FontWeight.w400,
+                                            color: const Color(0xFFFF8C42),
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: 'm',
+                                          style: GoogleFonts.paytoneOne(
+                                            fontSize: isExtraSmallScreen ? 22 : 
+                                                     isVerySmallScreen ? 24 : 26,
+                                            fontWeight: FontWeight.w400,
+                                            color: const Color(0xFF003092),
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: 'y',
+                                          style: GoogleFonts.paytoneOne(
+                                            fontSize: isExtraSmallScreen ? 22 : 
+                                                     isVerySmallScreen ? 24 : 26,
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    TextSpan(
-                                      text: 'Lu',
-                                      style: GoogleFonts.paytoneOne(
-                                        fontSize: isVerySmallScreen ? 24 : 28,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'm',
-                                      style: GoogleFonts.paytoneOne(
-                                        fontSize: isVerySmallScreen ? 24 : 28,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.orange,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'm',
-                                      style: GoogleFonts.paytoneOne(
-                                        fontSize: isVerySmallScreen ? 24 : 28,
-                                        fontWeight: FontWeight.w400,
-                                        color: const Color(0xFF003092),
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'y',
-                                      style: GoogleFonts.paytoneOne(
-                                        fontSize: isVerySmallScreen ? 24 : 28,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            
-                            SizedBox(height: isVerySmallScreen ? 20 : 30),
-                            
-                            // Campo Nome
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F9FA),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: _nameFocused 
-                                    ? const Color(0xFF4A90E2)
-                                    : Colors.transparent,
-                                  width: 2,
-                                ),
-                                boxShadow: _nameFocused 
-                                  ? [
-                                      BoxShadow(
-                                        color: const Color(0xFF4A90E2).withOpacity(0.1),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ]
-                                  : [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                              ),
-                              child: Focus(
-                                onFocusChange: (hasFocus) {
-                                  setState(() {
-                                    _nameFocused = hasFocus;
-                                  });
-                                },
-                                child: TextFormField(
-                                  controller: _nameController,
-                                  keyboardType: TextInputType.name,
-                                  textCapitalization: TextCapitalization.words,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: isVerySmallScreen ? 14 : 16,
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.w500,
                                   ),
-                                  decoration: InputDecoration(
-                                    hintText: 'Digite seu nome',
-                                    hintStyle: GoogleFonts.poppins(
-                                      color: Colors.grey[500],
-                                      fontSize: isVerySmallScreen ? 14 : 16,
+                                  SizedBox(height: isExtraSmallScreen ? 4 : 6),
+                                  Text(
+                                    'Configure seu perfil',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: isExtraSmallScreen ? 12 : 14,
+                                      color: Colors.grey[600],
                                       fontWeight: FontWeight.w400,
                                     ),
-                                    prefixIcon: Icon(
-                                      Icons.person_outline,
-                                      color: _nameFocused 
-                                        ? const Color(0xFF4A90E2)
-                                        : Colors.grey[500],
-                                      size: isVerySmallScreen ? 20 : 22,
-                                    ),
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: isVerySmallScreen ? 16 : 20,
-                                      vertical: isVerySmallScreen ? 14 : 18,
-                                    ),
-                                    errorStyle: GoogleFonts.poppins(
-                                      fontSize: isVerySmallScreen ? 10 : 12,
-                                    ),
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Por favor, digite seu nome';
-                                    }
-                                    if (value.length < 2) {
-                                      return 'Nome deve ter pelo menos 2 caracteres';
-                                    }
-                                    return null;
-                                  },
-                                ),
+                                ],
                               ),
                             ),
                             
-                            SizedBox(height: isVerySmallScreen ? 12 : 16),
+                            SizedBox(height: isExtraSmallScreen ? 16 : 20),
                             
-                            // Campo "Quem você é!"
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F9FA),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: _ageFocused 
-                                    ? const Color(0xFF4A90E2)
-                                    : Colors.transparent,
-                                  width: 2,
-                                ),
-                                boxShadow: _ageFocused 
-                                  ? [
-                                      BoxShadow(
-                                        color: const Color(0xFF4A90E2).withOpacity(0.1),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ]
-                                  : [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                              ),
-                              child: Focus(
-                                onFocusChange: (hasFocus) {
-                                  setState(() {
-                                    _ageFocused = hasFocus;
-                                  });
-                                },
-                                child: TextFormField(
-                                  controller: _ageController,
-                                  keyboardType: TextInputType.text,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: isVerySmallScreen ? 14 : 16,
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  decoration: InputDecoration(
-                                    hintText: 'Quem você é!',
-                                    hintStyle: GoogleFonts.poppins(
-                                      color: Colors.grey[500],
-                                      fontSize: isVerySmallScreen ? 14 : 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    prefixIcon: Icon(
-                                      Icons.psychology_outlined,
-                                      color: _ageFocused 
-                                        ? const Color(0xFF4A90E2)
-                                        : Colors.grey[500],
-                                      size: isVerySmallScreen ? 20 : 22,
-                                    ),
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: isVerySmallScreen ? 16 : 20,
-                                      vertical: isVerySmallScreen ? 14 : 18,
-                                    ),
-                                    errorStyle: GoogleFonts.poppins(
-                                      fontSize: isVerySmallScreen ? 10 : 12,
-                                    ),
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Por favor, digite quem você é';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                              ),
+                            // Campos do formulário
+                            _buildTextField(
+                              controller: _nameController,
+                              hintText: 'Digite seu nome',
+                              icon: Icons.person_outline,
+                              isFocused: _nameFocused,
+                              onFocusChange: (hasFocus) => setState(() => _nameFocused = hasFocus),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Por favor, digite seu nome';
+                                }
+                                if (value.length < 2) {
+                                  return 'Nome deve ter pelo menos 2 caracteres';
+                                }
+                                return null;
+                              },
+                              isExtraSmallScreen: isExtraSmallScreen,
                             ),
                             
-                            SizedBox(height: isVerySmallScreen ? 12 : 16),
+                            SizedBox(height: isExtraSmallScreen ? 10 : 12),
                             
-                            // Campo Senha
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F9FA),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: _passwordFocused 
-                                    ? const Color(0xFF4A90E2)
-                                    : Colors.transparent,
-                                  width: 2,
-                                ),
-                                boxShadow: _passwordFocused 
-                                  ? [
-                                      BoxShadow(
-                                        color: const Color(0xFF4A90E2).withOpacity(0.1),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ]
-                                  : [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                              ),
-                              child: Focus(
-                                onFocusChange: (hasFocus) {
-                                  setState(() {
-                                    _passwordFocused = hasFocus;
-                                  });
-                                },
-                                child: TextFormField(
-                                  controller: _passwordController,
-                                  obscureText: !_isPasswordVisible,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: isVerySmallScreen ? 14 : 16,
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  decoration: InputDecoration(
-                                    hintText: 'Sua Senha',
-                                    hintStyle: GoogleFonts.poppins(
-                                      color: Colors.grey[500],
-                                      fontSize: isVerySmallScreen ? 14 : 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    prefixIcon: Icon(
-                                      Icons.lock_outline,
-                                      color: _passwordFocused 
-                                        ? const Color(0xFF4A90E2)
-                                        : Colors.grey[500],
-                                      size: isVerySmallScreen ? 20 : 22,
-                                    ),
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: isVerySmallScreen ? 16 : 20,
-                                      vertical: isVerySmallScreen ? 14 : 18,
-                                    ),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _isPasswordVisible
-                                            ? Icons.visibility_outlined
-                                            : Icons.visibility_off_outlined,
-                                        color: _passwordFocused 
-                                          ? const Color(0xFF4A90E2)
-                                          : Colors.grey[500],
-                                        size: isVerySmallScreen ? 20 : 22,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _isPasswordVisible = !_isPasswordVisible;
-                                        });
-                                      },
-                                    ),
-                                    errorStyle: GoogleFonts.poppins(
-                                      fontSize: isVerySmallScreen ? 10 : 12,
-                                    ),
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Por favor, digite sua senha';
-                                    }
-                                    if (value.length < 6) {
-                                      return 'A senha deve ter pelo menos 6 caracteres';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                              ),
+                            _buildTextField(
+                              controller: _ageController,
+                              hintText: 'Quem você é!',
+                              icon: Icons.psychology_outlined,
+                              isFocused: _ageFocused,
+                              onFocusChange: (hasFocus) => setState(() => _ageFocused = hasFocus),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Por favor, digite quem você é';
+                                }
+                                return null;
+                              },
+                              isExtraSmallScreen: isExtraSmallScreen,
                             ),
                             
-                            SizedBox(height: isVerySmallScreen ? 20 : 30),
+                            SizedBox(height: isExtraSmallScreen ? 10 : 12),
+                            
+                            _buildTextField(
+                              controller: _passwordController,
+                              hintText: 'Sua Senha',
+                              icon: Icons.lock_outline,
+                              isFocused: _passwordFocused,
+                              onFocusChange: (hasFocus) => setState(() => _passwordFocused = hasFocus),
+                              isPassword: true,
+                              isPasswordVisible: _isPasswordVisible,
+                              onTogglePassword: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Por favor, digite sua senha';
+                                }
+                                if (value.length < 6) {
+                                  return 'A senha deve ter pelo menos 6 caracteres';
+                                }
+                                return null;
+                              },
+                              isExtraSmallScreen: isExtraSmallScreen,
+                            ),
+                            
+                            SizedBox(height: isExtraSmallScreen ? 16 : 20),
                             
                             // Botão Avançar
                             Container(
                               width: double.infinity,
-                              height: isVerySmallScreen ? 50 : 56,
+                              height: isExtraSmallScreen ? 48 : 52,
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
                                   colors: [
@@ -549,12 +435,12 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                     Color(0xFFFF7A28),
                                   ],
                                 ),
-                                borderRadius: BorderRadius.circular(isVerySmallScreen ? 25 : 28),
+                                borderRadius: BorderRadius.circular(isExtraSmallScreen ? 24 : 26),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFFF8C42).withOpacity(0.3),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
+                                    color: const Color(0xFFFF8C42).withOpacity(0.4),
+                                    blurRadius: 15,
+                                    offset: const Offset(0, 6),
                                   ),
                                 ],
                               ),
@@ -566,31 +452,29 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                   elevation: 0,
                                   shadowColor: Colors.transparent,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(isVerySmallScreen ? 25 : 28),
+                                    borderRadius: BorderRadius.circular(isExtraSmallScreen ? 24 : 26),
                                   ),
                                 ),
                                 child: _isLoading
                                     ? SizedBox(
-                                        height: isVerySmallScreen ? 18 : 20,
-                                        width: isVerySmallScreen ? 18 : 20,
+                                        height: isExtraSmallScreen ? 16 : 18,
+                                        width: isExtraSmallScreen ? 16 : 18,
                                         child: const CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation<Color>(
-                                            Colors.white,
-                                          ),
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                         ),
                                       )
                                     : Text(
                                         'Avançar',
                                         style: GoogleFonts.poppins(
-                                          fontSize: isVerySmallScreen ? 16 : 18,
+                                          fontSize: isExtraSmallScreen ? 15 : 17,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
                               ),
                             ),
                             
-                            SizedBox(height: isVerySmallScreen ? 15 : 20),
+                            SizedBox(height: isExtraSmallScreen ? 12 : 16),
                           ],
                         ),
                       ),
@@ -604,9 +488,94 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       ),
     );
   }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hintText,
+    required IconData icon,
+    required bool isFocused,
+    required Function(bool) onFocusChange,
+    required String? Function(String?) validator,
+    required bool isExtraSmallScreen,
+    bool isPassword = false,
+    bool isPasswordVisible = false,
+    VoidCallback? onTogglePassword,
+  }) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F9FA),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isFocused ? const Color(0xFF4A90E2) : Colors.transparent,
+          width: 2,
+        ),
+        boxShadow: isFocused
+            ? [
+                BoxShadow(
+                  color: const Color(0xFF4A90E2).withOpacity(0.15),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+      ),
+      child: Focus(
+        onFocusChange: onFocusChange,
+        child: TextFormField(
+          controller: controller,
+          obscureText: isPassword && !isPasswordVisible,
+          keyboardType: isPassword ? TextInputType.visiblePassword : TextInputType.text,
+          textCapitalization: isPassword ? TextCapitalization.none : TextCapitalization.words,
+          style: GoogleFonts.poppins(
+            fontSize: isExtraSmallScreen ? 13 : 15,
+            color: Colors.black87,
+            fontWeight: FontWeight.w500,
+          ),
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: GoogleFonts.poppins(
+              color: Colors.grey[500],
+              fontSize: isExtraSmallScreen ? 13 : 15,
+              fontWeight: FontWeight.w400,
+            ),
+            prefixIcon: Icon(
+              icon,
+              color: isFocused ? const Color(0xFF4A90E2) : Colors.grey[500],
+              size: isExtraSmallScreen ? 18 : 20,
+            ),
+            suffixIcon: isPassword
+                ? IconButton(
+                    icon: Icon(
+                      isPasswordVisible ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      color: isFocused ? const Color(0xFF4A90E2) : Colors.grey[500],
+                      size: isExtraSmallScreen ? 18 : 20,
+                    ),
+                    onPressed: onTogglePassword,
+                  )
+                : null,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: isExtraSmallScreen ? 14 : 16,
+              vertical: isExtraSmallScreen ? 12 : 14,
+            ),
+            errorStyle: GoogleFonts.poppins(
+              fontSize: isExtraSmallScreen ? 10 : 11,
+            ),
+          ),
+          validator: validator,
+        ),
+      ),
+    );
+  }
 }
 
-// Reutilizando a mesma classe das outras telas
 class FormTopClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
@@ -614,16 +583,16 @@ class FormTopClipper extends CustomClipper<Path> {
     
     path.moveTo(0, size.height);
     path.lineTo(size.width, size.height);
-    path.lineTo(size.width, 60);
+    path.lineTo(size.width, 50);
     
     path.quadraticBezierTo(
-      size.width * 0.75, 20,
-      size.width * 0.5, 20,
+      size.width * 0.8, 15,
+      size.width * 0.5, 15,
     );
     
     path.quadraticBezierTo(
-      size.width * 0.25, 20,
-      0, 60,
+      size.width * 0.2, 15,
+      0, 50,
     );
     
     path.close();
