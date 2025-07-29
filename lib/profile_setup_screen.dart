@@ -1,7 +1,7 @@
-// profile_setup_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'home_page.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({Key? key}) : super(key: key);
@@ -22,6 +22,11 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   bool _passwordFocused = false;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _ageController.dispose();
@@ -38,12 +43,12 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Perfil configurado com sucesso!'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      
+      // Navegar para a HomePage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomePage(),
         ),
       );
     }
@@ -64,26 +69,26 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-    
+
     // Sistema de responsividade
     final isExtraSmallScreen = screenHeight < 600;
     final isVerySmallScreen = screenHeight < 650;
     final isSmallScreen = screenHeight < 700;
     final isMediumScreen = screenHeight < 800;
-    
+
     // Tamanhos adaptativos
-    final astronautSize = isExtraSmallScreen ? 350.0 : 
-                         isVerySmallScreen ? 420.0 : 
-                         isSmallScreen ? 480.0 : 
-                         isMediumScreen ? 550.0 : 600.0;
-    
-    final profileImageSize = isExtraSmallScreen ? 100.0 : 
-                            isVerySmallScreen ? 120.0 : 
-                            isSmallScreen ? 140.0 : 160.0;
-    
-    final formHeightRatio = isExtraSmallScreen ? 0.65 : 
-                           isVerySmallScreen ? 0.60 : 
-                           isSmallScreen ? 0.55 : 0.50;
+    final astronautSize = isExtraSmallScreen ? 350.0 :
+                          isVerySmallScreen ? 420.0 :
+                          isSmallScreen ? 480.0 :
+                          isMediumScreen ? 550.0 : 600.0;
+
+    final profileImageSize = isExtraSmallScreen ? 100.0 :
+                             isVerySmallScreen ? 120.0 :
+                             isSmallScreen ? 140.0 : 160.0;
+
+    final formHeightRatio = isExtraSmallScreen ? 0.65 :
+                            isVerySmallScreen ? 0.60 :
+                            isSmallScreen ? 0.55 : 0.50;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -112,15 +117,15 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   ),
                 ),
               ),
-              
+
               // Astronauta na posição original
               Positioned(
-                top: isExtraSmallScreen ? -20 : 
-                     isVerySmallScreen ? -10 : 
-                     isSmallScreen ? 10 : 30,
-                right: isExtraSmallScreen ? -100 : 
-                       isVerySmallScreen ? -120 : 
-                       isSmallScreen ? -140 : -160,
+                top: isExtraSmallScreen ? -20 :
+                      isVerySmallScreen ? -10 :
+                      isSmallScreen ? 10 : 30,
+                right: isExtraSmallScreen ? -100 :
+                        isVerySmallScreen ? -120 :
+                        isSmallScreen ? -140 : -160,
                 child: Transform.rotate(
                   angle: -0.2,
                   child: SvgPicture.network(
@@ -144,17 +149,17 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   ),
                 ),
               ),
-              
-              // Campo de foto MINIMALISTA
+
+              // Campo de foto SIMPLES com cores do app
               Positioned(
-                top: isExtraSmallScreen ? screenHeight * 0.12 : 
-                     isVerySmallScreen ? screenHeight * 0.14 : 
-                     isSmallScreen ? screenHeight * 0.16 : 
-                     screenHeight * 0.18,
+                top: isExtraSmallScreen ? screenHeight * 0.12 :
+                      isVerySmallScreen ? screenHeight * 0.14 :
+                      isSmallScreen ? screenHeight * 0.16 :
+                      screenHeight * 0.18,
                 left: screenWidth * 0.08,
                 child: Stack(
                   children: [
-                    // Container principal minimalista
+                    // Container principal com cores do app
                     Container(
                       width: profileImageSize,
                       height: profileImageSize,
@@ -162,76 +167,62 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                         color: Colors.white,
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: const Color(0xFF4A90E2),
-                          width: isExtraSmallScreen ? 2 : 3,
+                          color: const Color(0xFF4A90E2), // Azul do app
+                          width: isExtraSmallScreen ? 3 : 4,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: const Color(0xFF4A90E2).withOpacity(0.2),
                             blurRadius: 15,
                             offset: const Offset(0, 8),
-                          ),
-                          BoxShadow(
-                            color: const Color(0xFF4A90E2).withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 4),
                           ),
                         ],
                       ),
                       child: ClipOval(
                         child: Container(
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Color(0xFFF8FBFF),
-                                Color(0xFFEDF4FF),
-                              ],
-                            ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF8FBFF), // Azul muito claro
                           ),
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              // Ícone minimalista
-                              Icon(
-                                Icons.add_a_photo_outlined,
-                                size: profileImageSize * 0.3,
-                                color: const Color(0xFF4A90E2).withOpacity(0.6),
-                              ),
-                              // Texto sutil
-                              Positioned(
-                                bottom: profileImageSize * 0.2,
-                                child: Text(
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.camera_alt_outlined,
+                                  size: profileImageSize * 0.3,
+                                  color: const Color(0xFF4A90E2),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
                                   'Adicionar foto',
                                   style: GoogleFonts.poppins(
-                                    fontSize: isExtraSmallScreen ? 8 : 10,
+                                    fontSize: isExtraSmallScreen ? 10 : 12,
                                     fontWeight: FontWeight.w500,
-                                    color: const Color(0xFF4A90E2).withOpacity(0.7),
+                                    color: const Color(0xFF4A90E2),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                    
-                    // Botão de adicionar minimalista
+
+                    // Botão de adicionar simples
                     Positioned(
                       bottom: 0,
                       right: 0,
                       child: GestureDetector(
                         onTap: _selectProfileImage,
                         child: Container(
-                          width: isExtraSmallScreen ? 32 : 36,
-                          height: isExtraSmallScreen ? 32 : 36,
+                          width: isExtraSmallScreen ? 36 : 40,
+                          height: isExtraSmallScreen ? 36 : 40,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF4A90E2),
+                            color: const Color(0xFF4A90E2), // Azul do app
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: Colors.white,
-                              width: 2,
+                              width: 3,
                             ),
                             boxShadow: [
                               BoxShadow(
@@ -244,7 +235,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                           child: Icon(
                             Icons.add,
                             color: Colors.white,
-                            size: isExtraSmallScreen ? 16 : 18,
+                            size: isExtraSmallScreen ? 18 : 20,
                           ),
                         ),
                       ),
@@ -252,7 +243,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   ],
                 ),
               ),
-              
+
               // Formulário
               Positioned(
                 bottom: 0,
@@ -289,10 +280,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(height: isExtraSmallScreen ? 15 : 
-                                             isVerySmallScreen ? 20 : 
-                                             isSmallScreen ? 25 : 35),
-                            
+                            SizedBox(height: isExtraSmallScreen ? 15 :
+                                              isVerySmallScreen ? 20 :
+                                              isSmallScreen ? 25 : 35),
+
                             // Título "Seja Lummy"
                             Center(
                               child: Column(
@@ -303,8 +294,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                         TextSpan(
                                           text: 'Seja ',
                                           style: GoogleFonts.inter(
-                                            fontSize: isExtraSmallScreen ? 22 : 
-                                                     isVerySmallScreen ? 24 : 26,
+                                            fontSize: isExtraSmallScreen ? 22 :
+                                                      isVerySmallScreen ? 24 : 26,
                                             fontWeight: FontWeight.w600,
                                             color: Colors.black87,
                                           ),
@@ -312,8 +303,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                         TextSpan(
                                           text: 'Lu',
                                           style: GoogleFonts.paytoneOne(
-                                            fontSize: isExtraSmallScreen ? 22 : 
-                                                     isVerySmallScreen ? 24 : 26,
+                                            fontSize: isExtraSmallScreen ? 22 :
+                                                      isVerySmallScreen ? 24 : 26,
                                             fontWeight: FontWeight.w400,
                                             color: Colors.black87,
                                           ),
@@ -321,8 +312,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                         TextSpan(
                                           text: 'm',
                                           style: GoogleFonts.paytoneOne(
-                                            fontSize: isExtraSmallScreen ? 22 : 
-                                                     isVerySmallScreen ? 24 : 26,
+                                            fontSize: isExtraSmallScreen ? 22 :
+                                                      isVerySmallScreen ? 24 : 26,
                                             fontWeight: FontWeight.w400,
                                             color: const Color(0xFFFF8C42),
                                           ),
@@ -330,8 +321,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                         TextSpan(
                                           text: 'm',
                                           style: GoogleFonts.paytoneOne(
-                                            fontSize: isExtraSmallScreen ? 22 : 
-                                                     isVerySmallScreen ? 24 : 26,
+                                            fontSize: isExtraSmallScreen ? 22 :
+                                                      isVerySmallScreen ? 24 : 26,
                                             fontWeight: FontWeight.w400,
                                             color: const Color(0xFF003092),
                                           ),
@@ -339,8 +330,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                         TextSpan(
                                           text: 'y',
                                           style: GoogleFonts.paytoneOne(
-                                            fontSize: isExtraSmallScreen ? 22 : 
-                                                     isVerySmallScreen ? 24 : 26,
+                                            fontSize: isExtraSmallScreen ? 22 :
+                                                      isVerySmallScreen ? 24 : 26,
                                             fontWeight: FontWeight.w400,
                                             color: Colors.black87,
                                           ),
@@ -360,9 +351,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                 ],
                               ),
                             ),
-                            
+
                             SizedBox(height: isExtraSmallScreen ? 16 : 20),
-                            
+
                             // Campos do formulário
                             _buildTextField(
                               controller: _nameController,
@@ -381,9 +372,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                               },
                               isExtraSmallScreen: isExtraSmallScreen,
                             ),
-                            
+
                             SizedBox(height: isExtraSmallScreen ? 10 : 12),
-                            
+
                             _buildTextField(
                               controller: _ageController,
                               hintText: 'Quem você é!',
@@ -398,9 +389,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                               },
                               isExtraSmallScreen: isExtraSmallScreen,
                             ),
-                            
+
                             SizedBox(height: isExtraSmallScreen ? 10 : 12),
-                            
+
                             _buildTextField(
                               controller: _passwordController,
                               hintText: 'Sua Senha',
@@ -421,9 +412,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                               },
                               isExtraSmallScreen: isExtraSmallScreen,
                             ),
-                            
+
                             SizedBox(height: isExtraSmallScreen ? 16 : 20),
-                            
+
                             // Botão Avançar
                             Container(
                               width: double.infinity,
@@ -473,7 +464,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                       ),
                               ),
                             ),
-                            
+
                             SizedBox(height: isExtraSmallScreen ? 12 : 16),
                           ],
                         ),
@@ -580,23 +571,23 @@ class FormTopClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    
+
     path.moveTo(0, size.height);
     path.lineTo(size.width, size.height);
     path.lineTo(size.width, 50);
-    
+
     path.quadraticBezierTo(
       size.width * 0.8, 15,
       size.width * 0.5, 15,
     );
-    
+
     path.quadraticBezierTo(
       size.width * 0.2, 15,
       0, 50,
     );
-    
+
     path.close();
-    
+
     return path;
   }
 
