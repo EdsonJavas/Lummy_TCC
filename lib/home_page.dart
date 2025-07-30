@@ -10,17 +10,47 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // Dados mockados do usuário (normalmente viriam do backend)
+  // Dados mockados do usuário
   final String userName = "Maria";
   final String userRole = "Pequena Empreendedora";
   final double currentBalance = 127.50;
   final double savingsGoal = 200.00;
-  final List<Transaction> recentTransactions = [
-    Transaction("Mesada recebida", 50.00, true, "Hoje"),
-    Transaction("Doce na escola", -5.50, false, "Ontem"),
-    Transaction("Venda de desenhos", 15.00, true, "2 dias atrás"),
-    Transaction("Presente para mamãe", -12.00, false, "3 dias atrás"),
+
+  // Lista de dicas educativas
+  int currentTipIndex = 0;
+  final List<EducationalTip> educationalTips = [
+    EducationalTip(
+      "Dica do Dia",
+      "Que tal anotar todos os seus gastos por uma semana?",
+      "📝",
+    ),
+    EducationalTip(
+      "Você Sabia?",
+      "Guardar 10% do que você ganha é um ótimo começo para suas metas!",
+      "💡",
+    ),
+    EducationalTip(
+      "Desafio",
+      "Tente economizar R\$ 5,00 esta semana comprando menos doces!",
+      "🎯",
+    ),
+    EducationalTip(
+      "Aprenda",
+      "Antes de comprar algo, pergunte: 'Eu realmente preciso disso?'",
+      "🤔",
+    ),
+    EducationalTip(
+      "Meta Inteligente",
+      "Divida sua meta grande em metas menores. Fica mais fácil!",
+      "🧠",
+    ),
   ];
+
+  void _nextTip() {
+    setState(() {
+      currentTipIndex = (currentTipIndex + 1) % educationalTips.length;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,33 +59,30 @@ class _HomePageState extends State<HomePage> {
     final isSmallScreen = screenHeight < 700;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FBFF),
+      backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
-              // Header com boas-vindas
-              _buildWelcomeHeader(screenWidth, isSmallScreen),
-              
+              // Header simples estilo Inter
+              _buildSimpleHeader(screenWidth, isSmallScreen),
+
               // Saldo atual
               _buildBalanceCard(screenWidth, isSmallScreen),
-              
+
               // Meta de economia
               _buildSavingsGoal(screenWidth, isSmallScreen),
-              
-              // Ações rápidas
-              _buildQuickActions(screenWidth, isSmallScreen),
-              
-              // Transações recentes
-              _buildRecentTransactions(screenWidth, isSmallScreen),
-              
+
+              // Ações rápidas (estilo Inter)
+              _buildQuickActionsInter(screenWidth, isSmallScreen),
+
               // Educação financeira
               _buildEducationSection(screenWidth, isSmallScreen),
-              
-              // Conquistas
-              _buildAchievements(screenWidth, isSmallScreen),
-              
+
+              // Conquistas melhoradas
+              _buildAchievementsImproved(screenWidth, isSmallScreen),
+
               const SizedBox(height: 20),
             ],
           ),
@@ -64,100 +91,81 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildWelcomeHeader(double screenWidth, bool isSmallScreen) {
+  Widget _buildSimpleHeader(double screenWidth, bool isSmallScreen) {
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF4A90E2),
-            Color(0xFF357ABD),
-          ],
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      color: const Color(0xFFF8FAFC),
+      padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Olá, $userName! 👋',
-                        style: GoogleFonts.poppins(
-                          fontSize: isSmallScreen ? 22 : 26,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        userRole,
-                        style: GoogleFonts.poppins(
-                          fontSize: isSmallScreen ? 14 : 16,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.white.withOpacity(0.9),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Que tal aprender algo novo hoje?',
-                        style: GoogleFonts.poppins(
-                          fontSize: isSmallScreen ? 12 : 14,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.white.withOpacity(0.8),
-                        ),
-                      ),
-                    ],
+                Text(
+                  'Olá, $userName',
+                  style: GoogleFonts.poppins(
+                    fontSize: isSmallScreen ? 24 : 28,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF1E293B),
                   ),
                 ),
-                Container(
-                  width: isSmallScreen ? 50 : 60,
-                  height: isSmallScreen ? 50 : 60,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: isSmallScreen ? 24 : 28,
+                const SizedBox(height: 4),
+                Text(
+                  'Como estão suas finanças hoje?',
+                  style: GoogleFonts.poppins(
+                    fontSize: isSmallScreen ? 14 : 16,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xFF64748B),
                   ),
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+          Container(
+            width: isSmallScreen ? 50 : 56,
+            height: isSmallScreen ? 50 : 56,
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E40AF),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF1E40AF).withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Icon(
+              Icons.person,
+              color: Colors.white,
+              size: isSmallScreen ? 24 : 28,
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildBalanceCard(double screenWidth, bool isSmallScreen) {
     return Container(
-      margin: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
+      margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16.0 : 20.0),
       padding: EdgeInsets.all(isSmallScreen ? 20.0 : 24.0),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFFFF8C42),
-            Color(0xFFFF7A28),
+            Color(0xFF1E40AF),
+            Color(0xFF1E3A8A),
           ],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFF8C42).withOpacity(0.3),
-            blurRadius: 15,
+            color: const Color(0xFF1E40AF).withOpacity(0.3),
+            blurRadius: 20,
             offset: const Offset(0, 8),
           ),
         ],
@@ -169,44 +177,71 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Meu Cofrinho 🐷',
+                'Meu Cofrinho',
                 style: GoogleFonts.poppins(
                   fontSize: isSmallScreen ? 16 : 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withOpacity(0.9),
                 ),
               ),
-              Icon(
-                Icons.visibility,
-                color: Colors.white.withOpacity(0.8),
-                size: isSmallScreen ? 20 : 24,
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '🐷',
+                  style: TextStyle(fontSize: isSmallScreen ? 16 : 20),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Text(
             'R\$ ${currentBalance.toStringAsFixed(2)}',
             style: GoogleFonts.poppins(
-              fontSize: isSmallScreen ? 32 : 36,
-              fontWeight: FontWeight.w800,
+              fontSize: isSmallScreen ? 36 : 42,
+              fontWeight: FontWeight.w700,
               color: Colors.white,
             ),
           ),
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(
-                Icons.trending_up,
-                color: Colors.white.withOpacity(0.9),
-                size: 16,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.trending_up,
+                      color: const Color(0xFF10B981),
+                      size: 14,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '+R\$ 15,00',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF10B981),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: 8),
               Text(
-                '+R\$ 15,00 esta semana',
+                'esta semana',
                 style: GoogleFonts.poppins(
-                  fontSize: isSmallScreen ? 12 : 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white.withOpacity(0.9),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.white.withOpacity(0.8),
                 ),
               ),
             ],
@@ -218,18 +253,19 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildSavingsGoal(double screenWidth, bool isSmallScreen) {
     final progress = currentBalance / savingsGoal;
-    
+
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16.0 : 20.0),
-      padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
+      margin: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
+      padding: EdgeInsets.all(isSmallScreen ? 20.0 : 24.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -237,109 +273,158 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Meta: Bicicleta Nova 🚲',
-                style: GoogleFonts.poppins(
-                  fontSize: isSmallScreen ? 16 : 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E40AF).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '🚲',
+                  style: TextStyle(fontSize: isSmallScreen ? 16 : 20),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Bicicleta Nova',
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 16 : 18,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF1E293B),
+                      ),
+                    ),
+                    Text(
+                      'Meta de economia',
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 12 : 14,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xFF64748B),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Text(
                 '${(progress * 100).toInt()}%',
                 style: GoogleFonts.poppins(
-                  fontSize: isSmallScreen ? 14 : 16,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF4A90E2),
+                  fontSize: isSmallScreen ? 16 : 18,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF1E40AF),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          LinearProgressIndicator(
-            value: progress,
-            backgroundColor: const Color(0xFFE8F4FD),
-            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF4A90E2)),
-            minHeight: 8,
+          const SizedBox(height: 20),
+          Container(
+            height: 8,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE2E8F0),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: FractionallySizedBox(
+              alignment: Alignment.centerLeft,
+              widthFactor: progress,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF1E40AF), Color(0xFF3B82F6)],
+                  ),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'R\$ ${currentBalance.toStringAsFixed(2)}',
-                style: GoogleFonts.poppins(
-                  fontSize: isSmallScreen ? 12 : 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Economizado',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF64748B),
+                    ),
+                  ),
+                  Text(
+                    'R\$ ${currentBalance.toStringAsFixed(2)}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF1E293B),
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                'R\$ ${savingsGoal.toStringAsFixed(2)}',
-                style: GoogleFonts.poppins(
-                  fontSize: isSmallScreen ? 12 : 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    'Falta',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF64748B),
+                    ),
+                  ),
+                  Text(
+                    'R\$ ${(savingsGoal - currentBalance).toStringAsFixed(2)}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF1E40AF),
+                    ),
+                  ),
+                ],
               ),
             ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Faltam apenas R\$ ${(savingsGoal - currentBalance).toStringAsFixed(2)}!',
-            style: GoogleFonts.poppins(
-              fontSize: isSmallScreen ? 12 : 14,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFF4A90E2),
-            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildQuickActions(double screenWidth, bool isSmallScreen) {
+  Widget _buildQuickActionsInter(double screenWidth, bool isSmallScreen) {
     return Container(
-      margin: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
+      margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16.0 : 20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Ações Rápidas',
+            'O que você quer fazer?',
             style: GoogleFonts.poppins(
               fontSize: isSmallScreen ? 18 : 20,
-              fontWeight: FontWeight.w700,
-              color: Colors.black87,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF1E293B),
             ),
           ),
           const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
-                child: _buildActionCard(
-                  'Adicionar\nDinheiro',
-                  Icons.add_circle_outline,
-                  const Color(0xFF4CAF50),
+                child: _buildActionCardInter(
+                  'Registrar Gasto',
+                  'Anote o que você gastou',
+                  Icons.receipt_long_outlined,
+                  const Color(0xFFEF4444),
                   isSmallScreen,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Expanded(
-                child: _buildActionCard(
-                  'Registrar\nGasto',
-                  Icons.remove_circle_outline,
-                  const Color(0xFFFF5722),
-                  isSmallScreen,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildActionCard(
-                  'Nova\nMeta',
+                child: _buildActionCardInter(
+                  'Nova Meta',
+                  'Defina um novo objetivo',
                   Icons.flag_outlined,
-                  const Color(0xFF9C27B0),
+                  const Color(0xFF8B5CF6),
                   isSmallScreen,
                 ),
               ),
@@ -350,28 +435,31 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildActionCard(String title, IconData icon, Color color, bool isSmallScreen) {
+  Widget _buildActionCardInter(String title, String subtitle, IconData icon,
+      Color color, bool isSmallScreen) {
     return Container(
       padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: isSmallScreen ? 40 : 48,
             height: isSmallScreen ? 40 : 48,
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               icon,
@@ -379,119 +467,22 @@ class _HomePageState extends State<HomePage> {
               size: isSmallScreen ? 20 : 24,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           Text(
             title,
-            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              fontSize: isSmallScreen ? 14 : 16,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF1E293B),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
             style: GoogleFonts.poppins(
               fontSize: isSmallScreen ? 12 : 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecentTransactions(double screenWidth, bool isSmallScreen) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16.0 : 20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Movimentações Recentes',
-                style: GoogleFonts.poppins(
-                  fontSize: isSmallScreen ? 18 : 20,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black87,
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  'Ver todas',
-                  style: GoogleFonts.poppins(
-                    fontSize: isSmallScreen ? 12 : 14,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF4A90E2),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: recentTransactions.length,
-              separatorBuilder: (context, index) => Divider(
-                color: Colors.grey[200],
-                height: 1,
-              ),
-              itemBuilder: (context, index) {
-                final transaction = recentTransactions[index];
-                return ListTile(
-                  leading: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: transaction.isIncome 
-                          ? const Color(0xFF4CAF50).withOpacity(0.1)
-                          : const Color(0xFFFF5722).withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      transaction.isIncome ? Icons.add : Icons.remove,
-                      color: transaction.isIncome 
-                          ? const Color(0xFF4CAF50)
-                          : const Color(0xFFFF5722),
-                      size: 20,
-                    ),
-                  ),
-                  title: Text(
-                    transaction.description,
-                    style: GoogleFonts.poppins(
-                      fontSize: isSmallScreen ? 14 : 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  subtitle: Text(
-                    transaction.date,
-                    style: GoogleFonts.poppins(
-                      fontSize: isSmallScreen ? 12 : 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  trailing: Text(
-                    '${transaction.isIncome ? '+' : '-'}R\$ ${transaction.amount.abs().toStringAsFixed(2)}',
-                    style: GoogleFonts.poppins(
-                      fontSize: isSmallScreen ? 14 : 16,
-                      fontWeight: FontWeight.w700,
-                      color: transaction.isIncome 
-                          ? const Color(0xFF4CAF50)
-                          : const Color(0xFFFF5722),
-                    ),
-                  ),
-                );
-              },
+              fontWeight: FontWeight.w400,
+              color: const Color(0xFF64748B),
             ),
           ),
         ],
@@ -500,97 +491,99 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildEducationSection(double screenWidth, bool isSmallScreen) {
+    final currentTip = educationalTips[currentTipIndex];
+
     return Container(
       margin: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Aprenda Brincando 🎓',
+            'Aprenda Brincando',
             style: GoogleFonts.poppins(
               fontSize: isSmallScreen ? 18 : 20,
-              fontWeight: FontWeight.w700,
-              color: Colors.black87,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF1E293B),
             ),
           ),
           const SizedBox(height: 16),
           Container(
-            padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
+            width: double.infinity,
+            padding: EdgeInsets.all(isSmallScreen ? 20.0 : 24.0),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Color(0xFF9C27B0),
-                  Color(0xFF673AB7),
+                  Color(0xFF8B5CF6),
+                  Color(0xFF7C3AED),
                 ],
               ),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF9C27B0).withOpacity(0.3),
-                  blurRadius: 15,
+                  color: const Color(0xFF8B5CF6).withOpacity(0.3),
+                  blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
               ],
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Dica do Dia',
-                        style: GoogleFonts.poppins(
-                          fontSize: isSmallScreen ? 14 : 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white.withOpacity(0.9),
-                        ),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Que tal anotar todos os seus gastos por uma semana?',
-                        style: GoogleFonts.poppins(
-                          fontSize: isSmallScreen ? 16 : 18,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
+                      child: Text(
+                        currentTip.emoji,
+                        style: TextStyle(fontSize: isSmallScreen ? 20 : 24),
                       ),
-                      const SizedBox(height: 12),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFF9C27B0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        ),
-                        child: Text(
-                          'Começar',
-                          style: GoogleFonts.poppins(
-                            fontSize: isSmallScreen ? 12 : 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      currentTip.category,
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 14 : 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white.withOpacity(0.9),
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  currentTip.content,
+                  style: GoogleFonts.poppins(
+                    fontSize: isSmallScreen ? 16 : 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                    height: 1.4,
                   ),
                 ),
-                const SizedBox(width: 16),
-                Container(
-                  width: isSmallScreen ? 60 : 80,
-                  height: isSmallScreen ? 60 : 80,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    shape: BoxShape.circle,
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _nextTip,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color(0xFF8B5CF6),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
+                    elevation: 0,
                   ),
-                  child: Icon(
-                    Icons.lightbulb_outline,
-                    color: Colors.white,
-                    size: isSmallScreen ? 30 : 40,
+                  child: Text(
+                    'Mais dicas',
+                    style: GoogleFonts.poppins(
+                      fontSize: isSmallScreen ? 14 : 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -601,111 +594,159 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildAchievements(double screenWidth, bool isSmallScreen) {
+  Widget _buildAchievementsImproved(double screenWidth, bool isSmallScreen) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16.0 : 20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Suas Conquistas 🏆',
-            style: GoogleFonts.poppins(
-              fontSize: isSmallScreen ? 18 : 20,
-              fontWeight: FontWeight.w700,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 16),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: _buildAchievementCard(
-                  '🥇',
-                  'Primeira\nEconomia',
-                  'Parabéns!',
-                  const Color(0xFFFFD700),
-                  isSmallScreen,
+              Text(
+                'Suas Conquistas',
+                style: GoogleFonts.poppins(
+                  fontSize: isSmallScreen ? 18 : 20,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF1E293B),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildAchievementCard(
-                  '📊',
-                  'Controle\nde Gastos',
-                  '7 dias',
-                  const Color(0xFF4A90E2),
-                  isSmallScreen,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildAchievementCard(
-                  '🎯',
-                  'Meta\nAlcançada',
-                  'Em breve',
-                  Colors.grey[400]!,
-                  isSmallScreen,
+              Text(
+                '2 de 5',
+                style: GoogleFonts.poppins(
+                  fontSize: isSmallScreen ? 14 : 16,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF64748B),
                 ),
               ),
             ],
           ),
+          const SizedBox(height: 16),
+          Container(
+            padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                _buildAchievementItem(
+                  '🥇',
+                  'Primeira Economia',
+                  'Você guardou seu primeiro dinheiro!',
+                  true,
+                  isSmallScreen,
+                ),
+                const SizedBox(height: 16),
+                _buildAchievementItem(
+                  '📊',
+                  'Controle de Gastos',
+                  'Anotou gastos por 7 dias seguidos',
+                  true,
+                  isSmallScreen,
+                ),
+                const SizedBox(height: 16),
+                _buildAchievementItem(
+                  '🎯',
+                  'Meta Alcançada',
+                  'Complete sua primeira meta de economia',
+                  false,
+                  isSmallScreen,
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildAchievementCard(String emoji, String title, String subtitle, Color color, bool isSmallScreen) {
-    return Container(
-      padding: EdgeInsets.all(isSmallScreen ? 12.0 : 16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.3), width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Text(
-            emoji,
-            style: TextStyle(fontSize: isSmallScreen ? 24 : 32),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              fontSize: isSmallScreen ? 12 : 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
+  Widget _buildAchievementItem(String emoji, String title, String description,
+      bool isCompleted, bool isSmallScreen) {
+    return Row(
+      children: [
+        Container(
+          width: isSmallScreen ? 48 : 56,
+          height: isSmallScreen ? 48 : 56,
+          decoration: BoxDecoration(
+            color: isCompleted
+                ? const Color(0xFF10B981).withOpacity(0.1)
+                : const Color(0xFFF1F5F9),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isCompleted
+                  ? const Color(0xFF10B981).withOpacity(0.3)
+                  : const Color(0xFFE2E8F0),
+              width: 1,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              fontSize: isSmallScreen ? 10 : 12,
-              fontWeight: FontWeight.w500,
-              color: color,
+          child: Center(
+            child: Text(
+              emoji,
+              style: TextStyle(
+                fontSize: isSmallScreen ? 20 : 24,
+                color: Colors.black.withOpacity(isCompleted ? 1.0 : 0.5),
+              ),
             ),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.poppins(
+                  fontSize: isSmallScreen ? 14 : 16,
+                  fontWeight: FontWeight.w600,
+                  color: isCompleted
+                      ? const Color(0xFF1E293B)
+                      : const Color(0xFF64748B),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                description,
+                style: GoogleFonts.poppins(
+                  fontSize: isSmallScreen ? 12 : 14,
+                  fontWeight: FontWeight.w400,
+                  color: const Color(0xFF64748B),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (isCompleted)
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: const Color(0xFF10B981),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.check,
+              color: Colors.white,
+              size: 16,
+            ),
+          ),
+      ],
     );
   }
 }
 
-class Transaction {
-  final String description;
-  final double amount;
-  final bool isIncome;
-  final String date;
+class EducationalTip {
+  final String category;
+  final String content;
+  final String emoji;
 
-  Transaction(this.description, this.amount, this.isIncome, this.date);
+  EducationalTip(this.category, this.content, this.emoji);
 }

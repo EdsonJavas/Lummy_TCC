@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'home_page.dart';
+import 'main_navigation.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({Key? key}) : super(key: key);
@@ -44,11 +45,11 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
         _isLoading = false;
       });
       
-      // Navegar para a HomePage
+      // Navegar para o MainNavigation ao invés da HomePage diretamente
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const HomePage(),
+          builder: (context) => const MainNavigation(),
         ),
       );
     }
