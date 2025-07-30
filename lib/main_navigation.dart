@@ -14,10 +14,9 @@ class _MainNavigationState extends State<MainNavigation> {
 
   final List<Widget> _pages = [
     const HomePage(),
-    // const TransactionsPage(),
-    // const GoalsPage(),
-    // const LearnPage(),
-    // const ProfilePage(),
+    const TransactionsPage(),
+    const GoalsPage(),
+    const LearnPage(),
   ];
 
   @override
@@ -47,7 +46,6 @@ class _MainNavigationState extends State<MainNavigation> {
                 Expanded(child: _buildNavItem(1, Icons.receipt_long_rounded, 'Gastos', const Color(0xFFEF4444))),
                 Expanded(child: _buildNavItem(2, Icons.flag_rounded, 'Metas', const Color(0xFF8B5CF6))),
                 Expanded(child: _buildNavItem(3, Icons.school_rounded, 'Aprender', const Color(0xFF10B981))),
-                Expanded(child: _buildNavItem(4, Icons.person_rounded, 'Perfil', const Color(0xFFFF8C42))),
               ],
             ),
           ),
@@ -58,7 +56,7 @@ class _MainNavigationState extends State<MainNavigation> {
 
   Widget _buildNavItem(int index, IconData icon, String label, Color color) {
     final isSelected = _currentIndex == index;
-
+    
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -67,7 +65,7 @@ class _MainNavigationState extends State<MainNavigation> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8), // reduzido
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
@@ -97,6 +95,247 @@ class _MainNavigationState extends State<MainNavigation> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// Páginas temporárias simplificadas
+class TransactionsPage extends StatelessWidget {
+  const TransactionsPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Meus Gastos',
+                style: GoogleFonts.poppins(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF1E293B),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Acompanhe onde você gasta seu dinheiro',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: const Color(0xFF64748B),
+                ),
+              ),
+              const SizedBox(height: 40),
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEF4444).withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.receipt_long_rounded,
+                          color: Color(0xFFEF4444),
+                          size: 50,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        'Em Desenvolvimento',
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF1E293B),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Esta tela estará disponível em breve!',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFF64748B),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class GoalsPage extends StatelessWidget {
+  const GoalsPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Minhas Metas',
+                style: GoogleFonts.poppins(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF1E293B),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Defina e acompanhe seus objetivos',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: const Color(0xFF64748B),
+                ),
+              ),
+              const SizedBox(height: 40),
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF8B5CF6).withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.flag_rounded,
+                          color: Color(0xFF8B5CF6),
+                          size: 50,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        'Em Desenvolvimento',
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF1E293B),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Esta tela estará disponível em breve!',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFF64748B),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class LearnPage extends StatelessWidget {
+  const LearnPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Aprender',
+                style: GoogleFonts.poppins(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF1E293B),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Educação financeira de forma divertida',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: const Color(0xFF64748B),
+                ),
+              ),
+              const SizedBox(height: 40),
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF10B981).withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.school_rounded,
+                          color: Color(0xFF10B981),
+                          size: 50,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        'Em Desenvolvimento',
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF1E293B),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Esta tela estará disponível em breve!',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFF64748B),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

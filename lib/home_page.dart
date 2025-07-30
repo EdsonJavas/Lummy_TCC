@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'profile_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -11,11 +11,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   // Dados mockados do usuário
-  final String userName = "Maria";
-  final String userRole = "Pequena Empreendedora";
+  final String userName = "Edson Jr";
+  final String userRole = "Pequeno Empreendedor";
   final double currentBalance = 127.50;
   final double savingsGoal = 200.00;
-
+  
   // Lista de dicas educativas
   int currentTipIndex = 0;
   final List<EducationalTip> educationalTips = [
@@ -67,22 +67,22 @@ class _HomePageState extends State<HomePage> {
             children: [
               // Header simples estilo Inter
               _buildSimpleHeader(screenWidth, isSmallScreen),
-
+              
               // Saldo atual
               _buildBalanceCard(screenWidth, isSmallScreen),
-
+              
               // Meta de economia
               _buildSavingsGoal(screenWidth, isSmallScreen),
-
+              
               // Ações rápidas (estilo Inter)
               _buildQuickActionsInter(screenWidth, isSmallScreen),
-
+              
               // Educação financeira
               _buildEducationSection(screenWidth, isSmallScreen),
-
+              
               // Conquistas melhoradas
               _buildAchievementsImproved(screenWidth, isSmallScreen),
-
+              
               const SizedBox(height: 20),
             ],
           ),
@@ -123,24 +123,54 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          Container(
-            width: isSmallScreen ? 50 : 56,
-            height: isSmallScreen ? 50 : 56,
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E40AF),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF1E40AF).withOpacity(0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfilePage(),
                 ),
-              ],
-            ),
-            child: Icon(
-              Icons.person,
-              color: Colors.white,
-              size: isSmallScreen ? 24 : 28,
+              );
+            },
+            child: Container(
+              width: isSmallScreen ? 50 : 56,
+              height: isSmallScreen ? 50 : 56,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: const Color(0xFF1E40AF),
+                  width: 2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF1E40AF).withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  child: Image.network(
+                    'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E40AF).withOpacity(0.1),
+                        ),
+                        child: Icon(
+                          Icons.person,
+                          color: const Color(0xFF1E40AF),
+                          size: isSmallScreen ? 24 : 28,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
             ),
           ),
         ],
@@ -148,6 +178,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Resto dos métodos permanecem iguais...
   Widget _buildBalanceCard(double screenWidth, bool isSmallScreen) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16.0 : 20.0),
@@ -218,9 +249,9 @@ class _HomePageState extends State<HomePage> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.trending_up,
-                      color: const Color(0xFF10B981),
+                      color: Color(0xFF10B981),
                       size: 14,
                     ),
                     const SizedBox(width: 4),
@@ -253,7 +284,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildSavingsGoal(double screenWidth, bool isSmallScreen) {
     final progress = currentBalance / savingsGoal;
-
+    
     return Container(
       margin: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
       padding: EdgeInsets.all(isSmallScreen ? 20.0 : 24.0),
@@ -435,8 +466,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildActionCardInter(String title, String subtitle, IconData icon,
-      Color color, bool isSmallScreen) {
+  Widget _buildActionCardInter(String title, String subtitle, IconData icon, Color color, bool isSmallScreen) {
     return Container(
       padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
       decoration: BoxDecoration(
@@ -492,7 +522,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildEducationSection(double screenWidth, bool isSmallScreen) {
     final currentTip = educationalTips[currentTipIndex];
-
+    
     return Container(
       margin: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
       child: Column(
@@ -574,8 +604,7 @@ class _HomePageState extends State<HomePage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     elevation: 0,
                   ),
                   child: Text(
@@ -669,20 +698,19 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildAchievementItem(String emoji, String title, String description,
-      bool isCompleted, bool isSmallScreen) {
+  Widget _buildAchievementItem(String emoji, String title, String description, bool isCompleted, bool isSmallScreen) {
     return Row(
       children: [
         Container(
           width: isSmallScreen ? 48 : 56,
           height: isSmallScreen ? 48 : 56,
           decoration: BoxDecoration(
-            color: isCompleted
+            color: isCompleted 
                 ? const Color(0xFF10B981).withOpacity(0.1)
                 : const Color(0xFFF1F5F9),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isCompleted
+              color: isCompleted 
                   ? const Color(0xFF10B981).withOpacity(0.3)
                   : const Color(0xFFE2E8F0),
               width: 1,
@@ -693,7 +721,7 @@ class _HomePageState extends State<HomePage> {
               emoji,
               style: TextStyle(
                 fontSize: isSmallScreen ? 20 : 24,
-                color: Colors.black.withOpacity(isCompleted ? 1.0 : 0.5),
+                // opacity: isCompleted ? 1.0 : 0.5,
               ),
             ),
           ),
@@ -708,7 +736,7 @@ class _HomePageState extends State<HomePage> {
                 style: GoogleFonts.poppins(
                   fontSize: isSmallScreen ? 14 : 16,
                   fontWeight: FontWeight.w600,
-                  color: isCompleted
+                  color: isCompleted 
                       ? const Color(0xFF1E293B)
                       : const Color(0xFF64748B),
                 ),
@@ -728,11 +756,11 @@ class _HomePageState extends State<HomePage> {
         if (isCompleted)
           Container(
             padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: const Color(0xFF10B981),
+            decoration: const BoxDecoration(
+              color: Color(0xFF10B981),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.check,
               color: Colors.white,
               size: 16,
