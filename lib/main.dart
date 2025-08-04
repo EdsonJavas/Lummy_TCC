@@ -12,7 +12,7 @@ class LummyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Lummy Login',
+      title: 'Lummy',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         fontFamily: 'Poppins',

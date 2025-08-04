@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lummy_login/sceens/new_goal_screen.dart';
 import 'profile_page.dart';
+import 'add_expense_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,11 +12,41 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // Dados mockados do usuário
+  // Dados do usuário
   final String userName = "Edson Jr";
   final String userRole = "Pequeno Empreendedor";
-  final double currentBalance = 127.50;
-  final double savingsGoal = 200.00;
+  double currentBalance = 127.50;
+  double savingsGoal = 200.00;
+  String goalName = "Bicicleta Nova";
+  String goalEmoji = "🚲";
+  
+  // Lista de transações
+  List<Map<String, dynamic>> transactions = [];
+  
+  // Lista de conquistas
+  List<Map<String, dynamic>> achievements = [
+    {
+      'id': 'first_saving',
+      'title': 'Primeira Economia',
+      'description': 'Você guardou seu primeiro dinheiro!',
+      'emoji': '🥇',
+      'isCompleted': true,
+    },
+    {
+      'id': 'expense_control',
+      'title': 'Controle de Gastos',
+      'description': 'Anotou gastos por 7 dias seguidos',
+      'emoji': '📊',
+      'isCompleted': true,
+    },
+    {
+      'id': 'goal_reached',
+      'title': 'Meta Alcançada',
+      'description': 'Complete sua primeira meta de economia',
+      'emoji': '🎯',
+      'isCompleted': false,
+    },
+  ];
   
   // Lista de dicas educativas
   int currentTipIndex = 0;
@@ -49,6 +81,49 @@ class _HomePageState extends State<HomePage> {
   void _nextTip() {
     setState(() {
       currentTipIndex = (currentTipIndex + 1) % educationalTips.length;
+    });
+  }
+
+  void _addTransaction(String description, double amount, String type, String category) {
+    setState(() {
+      transactions.add({
+        'id': DateTime.now().millisecondsSinceEpoch.toString(),
+        'description': description,
+        'amount': amount,
+        'type': type,
+        'category': category,
+        'date': DateTime.now(),
+      });
+      
+      if (type == 'expense') {
+        currentBalance -= amount;
+      } else {
+        currentBalance += amount;
+      }
+      
+      _checkAchievements();
+    });
+  }
+
+  void _setNewGoal(String name, String emoji, double amount) {
+    setState(() {
+      goalName = name;
+      goalEmoji = emoji;
+      savingsGoal = amount;
+    });
+  }
+
+  void _checkAchievements() {
+    setState(() {
+      // Verificar meta alcançada
+      if (currentBalance >= savingsGoal) {
+        achievements = achievements.map((achievement) {
+          if (achievement['id'] == 'goal_reached') {
+            achievement['isCompleted'] = true;
+          }
+          return achievement;
+        }).toList();
+      }
     });
   }
 
@@ -178,7 +253,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Resto dos métodos permanecem iguais...
   Widget _buildBalanceCard(double screenWidth, bool isSmallScreen) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16.0 : 20.0),
@@ -312,7 +386,7 @@ class _HomePageState extends State<HomePage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '🚲',
+                  goalEmoji,
                   style: TextStyle(fontSize: isSmallScreen ? 16 : 20),
                 ),
               ),
@@ -322,7 +396,7 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Bicicleta Nova',
+                      goalName,
                       style: GoogleFonts.poppins(
                         fontSize: isSmallScreen ? 16 : 18,
                         fontWeight: FontWeight.w600,
@@ -359,7 +433,7 @@ class _HomePageState extends State<HomePage> {
             ),
             child: FractionallySizedBox(
               alignment: Alignment.centerLeft,
-              widthFactor: progress,
+              widthFactor: progress > 1.0 ? 1.0 : progress,
               child: Container(
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
@@ -441,22 +515,89 @@ class _HomePageState extends State<HomePage> {
           Row(
             children: [
               Expanded(
-                child: _buildActionCardInter(
-                  'Registrar Gasto',
-                  'Anote o que você gastou',
-                  Icons.receipt_long_outlined,
-                  const Color(0xFFEF4444),
-                  isSmallScreen,
+                child: GestureDetector(
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AddExpenseScreen(),
+                      ),
+                    );
+                    
+                    if (result != null) {
+                      _addTransaction(
+                        result['description'],
+                        result['amount'],
+                        result['type'],
+                        result['category'],
+                      );
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            result['type'] == 'expense' 
+                                ? 'Gasto registrado! 📝'
+                                : 'Dinheiro adicionado! 💰',
+                            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                          ),
+                          backgroundColor: const Color(0xFF10B981),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  child: _buildActionCardInter(
+                    'Registrar Gasto',
+                    'Anote o que você gastou',
+                    Icons.receipt_long_outlined,
+                    const Color(0xFFEF4444),
+                    isSmallScreen,
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildActionCardInter(
-                  'Nova Meta',
-                  'Defina um novo objetivo',
-                  Icons.flag_outlined,
-                  const Color(0xFF8B5CF6),
-                  isSmallScreen,
+                child: GestureDetector(
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const NewGoalScreen(),
+                      ),
+                    );
+                    
+                    if (result != null) {
+                      _setNewGoal(
+                        result['name'],
+                        result['emoji'],
+                        result['amount'],
+                      );
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Nova meta criada! 🎯',
+                            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                          ),
+                          backgroundColor: const Color(0xFF8B5CF6),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  child: _buildActionCardInter(
+                    'Nova Meta',
+                    'Defina um novo objetivo',
+                    Icons.flag_outlined,
+                    const Color(0xFF8B5CF6),
+                    isSmallScreen,
+                  ),
                 ),
               ),
             ],
@@ -624,6 +765,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildAchievementsImproved(double screenWidth, bool isSmallScreen) {
+    final completedAchievements = achievements.where((a) => a['isCompleted'] == true).length;
+    
     return Container(
       margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16.0 : 20.0),
       child: Column(
@@ -641,7 +784,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               Text(
-                '2 de 5',
+                '$completedAchievements de ${achievements.length}',
                 style: GoogleFonts.poppins(
                   fontSize: isSmallScreen ? 14 : 16,
                   fontWeight: FontWeight.w500,
@@ -666,31 +809,22 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             child: Column(
-              children: [
-                _buildAchievementItem(
-                  '🥇',
-                  'Primeira Economia',
-                  'Você guardou seu primeiro dinheiro!',
-                  true,
-                  isSmallScreen,
-                ),
-                const SizedBox(height: 16),
-                _buildAchievementItem(
-                  '📊',
-                  'Controle de Gastos',
-                  'Anotou gastos por 7 dias seguidos',
-                  true,
-                  isSmallScreen,
-                ),
-                const SizedBox(height: 16),
-                _buildAchievementItem(
-                  '🎯',
-                  'Meta Alcançada',
-                  'Complete sua primeira meta de economia',
-                  false,
-                  isSmallScreen,
-                ),
-              ],
+              children: achievements.asMap().entries.map((entry) {
+                final index = entry.key;
+                final achievement = entry.value;
+                return Column(
+                  children: [
+                    if (index > 0) const SizedBox(height: 16),
+                    _buildAchievementItem(
+                      achievement['emoji'],
+                      achievement['title'],
+                      achievement['description'],
+                      achievement['isCompleted'],
+                      isSmallScreen,
+                    ),
+                  ],
+                );
+              }).toList(),
             ),
           ),
         ],
@@ -705,12 +839,12 @@ class _HomePageState extends State<HomePage> {
           width: isSmallScreen ? 48 : 56,
           height: isSmallScreen ? 48 : 56,
           decoration: BoxDecoration(
-            color: isCompleted 
+            color: isCompleted
                 ? const Color(0xFF10B981).withOpacity(0.1)
                 : const Color(0xFFF1F5F9),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isCompleted 
+              color: isCompleted
                   ? const Color(0xFF10B981).withOpacity(0.3)
                   : const Color(0xFFE2E8F0),
               width: 1,
@@ -721,7 +855,6 @@ class _HomePageState extends State<HomePage> {
               emoji,
               style: TextStyle(
                 fontSize: isSmallScreen ? 20 : 24,
-                // opacity: isCompleted ? 1.0 : 0.5,
               ),
             ),
           ),
@@ -736,7 +869,7 @@ class _HomePageState extends State<HomePage> {
                 style: GoogleFonts.poppins(
                   fontSize: isSmallScreen ? 14 : 16,
                   fontWeight: FontWeight.w600,
-                  color: isCompleted 
+                  color: isCompleted
                       ? const Color(0xFF1E293B)
                       : const Color(0xFF64748B),
                 ),
