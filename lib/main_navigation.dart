@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'home_page.dart';
+import 'expenses_screen.dart'; // Importando a tela de gastos
+import 'lessons_screen.dart'; // Importando a nova LessonsScreen estilizada
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({Key? key}) : super(key: key);
@@ -14,9 +16,9 @@ class _MainNavigationState extends State<MainNavigation> {
 
   final List<Widget> _pages = [
     const HomePage(),
-    const TransactionsPage(),
+    const ExpensesScreen(),
     const GoalsPage(),
-    const LearnPage(),
+    const LessonsScreen(), // Usando a nova LessonsScreen ao invés do placeholder
   ];
 
   @override
@@ -103,7 +105,7 @@ class _MainNavigationState extends State<MainNavigation> {
 
 // Páginas temporárias simplificadas
 class TransactionsPage extends StatelessWidget {
-  const TransactionsPage({Key? key}) : super(key: key);
+  const TransactionsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -228,86 +230,6 @@ class GoalsPage extends StatelessWidget {
                         child: const Icon(
                           Icons.flag_rounded,
                           color: Color(0xFF8B5CF6),
-                          size: 50,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        'Em Desenvolvimento',
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF1E293B),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Esta tela estará disponível em breve!',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: const Color(0xFF64748B),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class LearnPage extends StatelessWidget {
-  const LearnPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Aprender',
-                style: GoogleFonts.poppins(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF1E293B),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Educação financeira de forma divertida',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: const Color(0xFF64748B),
-                ),
-              ),
-              const SizedBox(height: 40),
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF10B981).withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.school_rounded,
-                          color: Color(0xFF10B981),
                           size: 50,
                         ),
                       ),
