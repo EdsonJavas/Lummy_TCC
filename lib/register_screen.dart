@@ -1,7 +1,9 @@
 // register_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'register_children_screen.dart'; // Adicione este import
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -12,22 +14,60 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _cpfController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   bool _isLoading = false;
+  bool _nameFocused = false;
+  bool _cpfFocused = false;
   bool _emailFocused = false;
   bool _passwordFocused = false;
   bool _confirmPasswordFocused = false;
 
   @override
   void dispose() {
+    _nameController.dispose();
+    _cpfController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  // Função para formatar CPF
+  String _formatCPF(String cpf) {
+    cpf = cpf.replaceAll(RegExp(r'[^0-9]'), '');
+    if (cpf.length <= 3) return cpf;
+    if (cpf.length <= 6) return '${cpf.substring(0, 3)}.${cpf.substring(3)}';
+    if (cpf.length <= 9) return '${cpf.substring(0, 3)}.${cpf.substring(3, 6)}.${cpf.substring(6)}';
+    return '${cpf.substring(0, 3)}.${cpf.substring(3, 6)}.${cpf.substring(6, 9)}-${cpf.substring(9, 11)}';
+  }
+
+  // Função para validar CPF
+  bool _isValidCPF(String cpf) {
+    cpf = cpf.replaceAll(RegExp(r'[^0-9]'), '');
+    if (cpf.length != 11) return false;
+    if (RegExp(r'^(\d)\1*$').hasMatch(cpf)) return false;
+
+    int sum = 0;
+    for (int i = 0; i < 9; i++) {
+      sum += int.parse(cpf[i]) * (10 - i);
+    }
+    int digit1 = 11 - (sum % 11);
+    if (digit1 >= 10) digit1 = 0;
+
+    sum = 0;
+    for (int i = 0; i < 10; i++) {
+      sum += int.parse(cpf[i]) * (11 - i);
+    }
+    int digit2 = 11 - (sum % 11);
+    if (digit2 >= 10) digit2 = 0;
+
+    return digit1 == int.parse(cpf[9]) && digit2 == int.parse(cpf[10]);
   }
 
   Future<void> _handleRegister() async {
@@ -42,12 +82,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _isLoading = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Conta criada com sucesso!'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      // Navegar para a tela de cadastro de crianças
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const RegisterChildrenScreen(),
         ),
       );
     }
@@ -94,7 +133,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Padding(
                   padding: EdgeInsets.only(
                     left: 24.0, 
-                    top: isVerySmallScreen ? 10 : 20, // Reduzido de 30
+                    top: isVerySmallScreen ? 10 : 20,
                   ),
                   child: Row(
                     children: [
@@ -149,7 +188,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Center(
                   child: SvgPicture.network(
                     'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/astronauta-lummy-OXK8DpNpgdSxKxNZKtIyQynALBlh6n.svg',
-                    height: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380), // Mesmo tamanho do login
+                    height: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
                     fit: BoxFit.contain,
                     placeholderBuilder: (context) => Container(
                       height: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
@@ -168,7 +207,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               
-              // Formulário na parte inferior - ajustado para não empurrar o astronauta
+              // Formulário na parte inferior - ajustado para mais campos
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -177,8 +216,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   clipper: FormTopClipper(),
                   child: Container(
                     constraints: BoxConstraints(
-                      minHeight: isVerySmallScreen ? screenHeight * 0.6 : screenHeight * 0.55,
-                      maxHeight: isVerySmallScreen ? screenHeight * 0.8 : screenHeight * 0.75,
+                      minHeight: isVerySmallScreen ? screenHeight * 0.65 : screenHeight * 0.60,
+                      maxHeight: isVerySmallScreen ? screenHeight * 0.85 : screenHeight * 0.80,
                     ),
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -208,7 +247,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             
                             // Título "Crie sua conta" - responsivo
                             Text(
-                              'Crie sua conta',
+                              'Crie sua conta de Responsável',
                               style: GoogleFonts.inter(
                                 fontSize: isVerySmallScreen ? 24 : 28,
                                 fontWeight: FontWeight.w600,
@@ -217,6 +256,178 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             
                             SizedBox(height: isVerySmallScreen ? 15 : 20),
+                            
+                            // Campo Nome do responsável
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8F9FA),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _nameFocused 
+                                    ? const Color(0xFF4A90E2)
+                                    : Colors.transparent,
+                                  width: 2,
+                                ),
+                                boxShadow: _nameFocused 
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(0xFF4A90E2).withOpacity(0.1),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                  : [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.05),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                              ),
+                              child: Focus(
+                                onFocusChange: (hasFocus) {
+                                  setState(() {
+                                    _nameFocused = hasFocus;
+                                  });
+                                },
+                                child: TextFormField(
+                                  controller: _nameController,
+                                  keyboardType: TextInputType.name,
+                                  textCapitalization: TextCapitalization.words,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: isVerySmallScreen ? 14 : 16,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintText: 'Nome do responsável',
+                                    hintStyle: GoogleFonts.poppins(
+                                      color: Colors.grey[500],
+                                      fontSize: isVerySmallScreen ? 14 : 16,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    prefixIcon: Icon(
+                                      Icons.person_outline,
+                                      color: _nameFocused 
+                                        ? const Color(0xFF4A90E2)
+                                        : Colors.grey[500],
+                                      size: isVerySmallScreen ? 20 : 22,
+                                    ),
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: isVerySmallScreen ? 16 : 20,
+                                      vertical: isVerySmallScreen ? 14 : 18,
+                                    ),
+                                    errorStyle: GoogleFonts.poppins(
+                                      fontSize: isVerySmallScreen ? 10 : 12,
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Por favor, insira o nome do responsável';
+                                    }
+                                    if (value.trim().length < 2) {
+                                      return 'Nome deve ter pelo menos 2 caracteres';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ),
+                            
+                            SizedBox(height: isVerySmallScreen ? 10 : 14),
+                            
+                            // Campo CPF
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8F9FA),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _cpfFocused 
+                                    ? const Color(0xFF4A90E2)
+                                    : Colors.transparent,
+                                  width: 2,
+                                ),
+                                boxShadow: _cpfFocused 
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(0xFF4A90E2).withOpacity(0.1),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                  : [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.05),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                              ),
+                              child: Focus(
+                                onFocusChange: (hasFocus) {
+                                  setState(() {
+                                    _cpfFocused = hasFocus;
+                                  });
+                                },
+                                child: TextFormField(
+                                  controller: _cpfController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(11),
+                                    TextInputFormatter.withFunction((oldValue, newValue) {
+                                      final formatted = _formatCPF(newValue.text);
+                                      return TextEditingValue(
+                                        text: formatted,
+                                        selection: TextSelection.collapsed(offset: formatted.length),
+                                      );
+                                    }),
+                                  ],
+                                  style: GoogleFonts.poppins(
+                                    fontSize: isVerySmallScreen ? 14 : 16,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintText: 'CPF do responsável',
+                                    hintStyle: GoogleFonts.poppins(
+                                      color: Colors.grey[500],
+                                      fontSize: isVerySmallScreen ? 14 : 16,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    prefixIcon: Icon(
+                                      Icons.badge_outlined,
+                                      color: _cpfFocused 
+                                        ? const Color(0xFF4A90E2)
+                                        : Colors.grey[500],
+                                      size: isVerySmallScreen ? 20 : 22,
+                                    ),
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: isVerySmallScreen ? 16 : 20,
+                                      vertical: isVerySmallScreen ? 14 : 18,
+                                    ),
+                                    errorStyle: GoogleFonts.poppins(
+                                      fontSize: isVerySmallScreen ? 10 : 12,
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Por favor, insira o CPF do responsável';
+                                    }
+                                    if (!_isValidCPF(value)) {
+                                      return 'Por favor, insira um CPF válido';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ),
+                            
+                            SizedBox(height: isVerySmallScreen ? 10 : 14),
                             
                             // Campo E-mail do responsável
                             AnimatedContainer(
