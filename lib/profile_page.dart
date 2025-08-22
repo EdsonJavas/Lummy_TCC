@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+  const ProfilePage({super.key});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -67,12 +67,12 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildProfileHeader(double screenWidth, double screenHeight) {
-    return Container(
+    return SizedBox(
       height: screenHeight * 0.60,
       width: double.infinity,
       child: Stack(
         children: [
-          Container(
+          SizedBox(
             height: screenHeight * 0.60,
             width: double.infinity,
             child: Image.network(
@@ -332,7 +332,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+      String label, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
@@ -403,10 +404,12 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row( // Esta é a Row que estava causando o overflow
+          Row(
+            // Esta é a Row que estava causando o overflow
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded( // Adicionado Expanded aqui
+              Expanded(
+                // Adicionado Expanded aqui
                 child: Text(
                   'Medalhas Conquistadas',
                   style: GoogleFonts.poppins(
@@ -414,7 +417,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF1E293B),
                   ),
-                  overflow: TextOverflow.ellipsis, // Adicionado para evitar overflow de texto
+                  overflow: TextOverflow
+                      .ellipsis, // Adicionado para evitar overflow de texto
                 ),
               ),
               Container(
@@ -439,22 +443,24 @@ class _ProfilePageState extends State<ProfilePage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Medalhas conquistadas (2)
-                    ...List.generate(2, (index) => Container(
-                      width: 8,
-                      height: 8,
-                      margin: EdgeInsets.only(right: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.white.withOpacity(0.5),
-                            blurRadius: 4,
-                            offset: Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                    )),
+                    ...List.generate(
+                        2,
+                        (index) => Container(
+                              width: 8,
+                              height: 8,
+                              margin: EdgeInsets.only(right: 3),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(0.5),
+                                    blurRadius: 4,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                            )),
 
                     SizedBox(width: 6),
 
@@ -468,15 +474,17 @@ class _ProfilePageState extends State<ProfilePage> {
                     SizedBox(width: 6),
 
                     // Medalhas não conquistadas (3)
-                    ...List.generate(3, (index) => Container(
-                      width: 6,
-                      height: 6,
-                      margin: EdgeInsets.only(right: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
-                        shape: BoxShape.circle,
-                      ),
-                    )),
+                    ...List.generate(
+                        3,
+                        (index) => Container(
+                              width: 6,
+                              height: 6,
+                              margin: EdgeInsets.only(right: 3),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.3),
+                                shape: BoxShape.circle,
+                              ),
+                            )),
 
                     SizedBox(width: 8),
 
@@ -524,12 +532,12 @@ class _ProfilePageState extends State<ProfilePage> {
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            color: isUnlocked 
+            color: isUnlocked
                 ? Color(0xFFFF8C42).withOpacity(0.1)
                 : Color(0xFFF1F5F9),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isUnlocked 
+              color: isUnlocked
                   ? Color(0xFFFF8C42).withOpacity(0.3)
                   : Color(0xFFE2E8F0),
               width: 2,
@@ -552,9 +560,7 @@ class _ProfilePageState extends State<ProfilePage> {
           style: GoogleFonts.poppins(
             fontSize: 12,
             fontWeight: FontWeight.w500,
-            color: isUnlocked 
-                ? Color(0xFF1E293B)
-                : Color(0xFF64748B),
+            color: isUnlocked ? Color(0xFF1E293B) : Color(0xFF64748B),
           ),
         ),
       ],
@@ -616,7 +622,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildSettingItem(IconData icon, String title, String subtitle, Color color) {
+  Widget _buildSettingItem(
+      IconData icon, String title, String subtitle, Color color) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(

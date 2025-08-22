@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'register_children_screen.dart'; // Adicione este import
+import 'register_children_screen.dart';
+import 'responsavel_model.dart'; // <-- ADICIONADO
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -43,7 +44,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     cpf = cpf.replaceAll(RegExp(r'[^0-9]'), '');
     if (cpf.length <= 3) return cpf;
     if (cpf.length <= 6) return '${cpf.substring(0, 3)}.${cpf.substring(3)}';
-    if (cpf.length <= 9) return '${cpf.substring(0, 3)}.${cpf.substring(3, 6)}.${cpf.substring(6)}';
+    if (cpf.length <= 9)
+      return '${cpf.substring(0, 3)}.${cpf.substring(3, 6)}.${cpf.substring(6)}';
     return '${cpf.substring(0, 3)}.${cpf.substring(3, 6)}.${cpf.substring(6, 9)}-${cpf.substring(9, 11)}';
   }
 
@@ -82,11 +84,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _isLoading = false;
       });
 
-      // Navegar para a tela de cadastro de crianças
+      // Criar objeto Responsavel
+      final responsavel = Responsavel(
+        nome: _nameController.text.trim(),
+        cpf: _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+        email: _emailController.text.trim(),
+        senha: _passwordController.text,
+      );
+
+      // Passar para próxima tela
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const RegisterChildrenScreen(),
+          builder: (context) =>
+              RegisterChildrenScreen(responsavel: responsavel),
         ),
       );
     }
@@ -97,11 +108,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-    
+
     // Responsividade para telas muito pequenas
     final isVerySmallScreen = screenHeight < 650;
     final isSmallScreen = screenHeight < 700;
-    
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
@@ -127,12 +138,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
               ),
-              
+
               // Logo no topo - SUBIDO (menos padding)
               SafeArea(
                 child: Padding(
                   padding: EdgeInsets.only(
-                    left: 24.0, 
+                    left: 24.0,
                     top: isVerySmallScreen ? 10 : 20,
                   ),
                   child: Row(
@@ -179,34 +190,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
               ),
-              
+
               // Astronauta - mesmo tamanho da tela de login
               Positioned(
-                top: isVerySmallScreen ? screenHeight * 0.08 : screenHeight * 0.10,
+                top: isVerySmallScreen
+                    ? screenHeight * 0.08
+                    : screenHeight * 0.10,
                 left: screenWidth * 0.15,
                 right: screenWidth * 0.05,
                 child: Center(
                   child: SvgPicture.network(
                     'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/astronauta-lummy-OXK8DpNpgdSxKxNZKtIyQynALBlh6n.svg',
-                    height: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
+                    height:
+                        isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
                     fit: BoxFit.contain,
                     placeholderBuilder: (context) => Container(
-                      height: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
-                      width: isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
+                      height:
+                          isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
+                      width:
+                          isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(isVerySmallScreen ? 125 : (isSmallScreen ? 150 : 190)),
+                        borderRadius: BorderRadius.circular(isVerySmallScreen
+                            ? 125
+                            : (isSmallScreen ? 150 : 190)),
                       ),
                       child: Icon(
                         Icons.person,
-                        size: isVerySmallScreen ? 100 : (isSmallScreen ? 120 : 180),
+                        size: isVerySmallScreen
+                            ? 100
+                            : (isSmallScreen ? 120 : 180),
                         color: Colors.white,
                       ),
                     ),
                   ),
                 ),
               ),
-              
+
               // Formulário na parte inferior - ajustado para mais campos
               Positioned(
                 bottom: 0,
@@ -216,8 +236,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   clipper: FormTopClipper(),
                   child: Container(
                     constraints: BoxConstraints(
-                      minHeight: isVerySmallScreen ? screenHeight * 0.65 : screenHeight * 0.60,
-                      maxHeight: isVerySmallScreen ? screenHeight * 0.85 : screenHeight * 0.80,
+                      minHeight: isVerySmallScreen
+                          ? screenHeight * 0.65
+                          : screenHeight * 0.60,
+                      maxHeight: isVerySmallScreen
+                          ? screenHeight * 0.85
+                          : screenHeight * 0.80,
                     ),
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -235,7 +259,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         left: isVerySmallScreen ? 20.0 : 24.0,
                         right: isVerySmallScreen ? 20.0 : 24.0,
                         top: isVerySmallScreen ? 20.0 : 24.0,
-                        bottom: (isVerySmallScreen ? 20.0 : 24.0) + keyboardHeight,
+                        bottom:
+                            (isVerySmallScreen ? 20.0 : 24.0) + keyboardHeight,
                       ),
                       child: Form(
                         key: _formKey,
@@ -243,8 +268,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(height: isVerySmallScreen ? 15 : (isSmallScreen ? 25 : 35)),
-                            
+                            SizedBox(
+                                height: isVerySmallScreen
+                                    ? 15
+                                    : (isSmallScreen ? 25 : 35)),
+
                             // Título "Crie sua conta" - responsivo
                             Text(
                               'Crie sua conta de Responsável',
@@ -254,9 +282,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 color: Colors.black,
                               ),
                             ),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 15 : 20),
-                            
+
                             // Campo Nome do responsável
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
@@ -264,26 +292,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 color: const Color(0xFFF8F9FA),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: _nameFocused 
-                                    ? const Color(0xFF4A90E2)
-                                    : Colors.transparent,
+                                  color: _nameFocused
+                                      ? const Color(0xFF4A90E2)
+                                      : Colors.transparent,
                                   width: 2,
                                 ),
-                                boxShadow: _nameFocused 
-                                  ? [
-                                      BoxShadow(
-                                        color: const Color(0xFF4A90E2).withOpacity(0.1),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ]
-                                  : [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
+                                boxShadow: _nameFocused
+                                    ? [
+                                        BoxShadow(
+                                          color: const Color(0xFF4A90E2)
+                                              .withOpacity(0.1),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                    : [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.05),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
                               ),
                               child: Focus(
                                 onFocusChange: (hasFocus) {
@@ -309,9 +338,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     ),
                                     prefixIcon: Icon(
                                       Icons.person_outline,
-                                      color: _nameFocused 
-                                        ? const Color(0xFF4A90E2)
-                                        : Colors.grey[500],
+                                      color: _nameFocused
+                                          ? const Color(0xFF4A90E2)
+                                          : Colors.grey[500],
                                       size: isVerySmallScreen ? 20 : 22,
                                     ),
                                     border: InputBorder.none,
@@ -335,9 +364,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               ),
                             ),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 10 : 14),
-                            
+
                             // Campo CPF
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
@@ -345,26 +374,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 color: const Color(0xFFF8F9FA),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: _cpfFocused 
-                                    ? const Color(0xFF4A90E2)
-                                    : Colors.transparent,
+                                  color: _cpfFocused
+                                      ? const Color(0xFF4A90E2)
+                                      : Colors.transparent,
                                   width: 2,
                                 ),
-                                boxShadow: _cpfFocused 
-                                  ? [
-                                      BoxShadow(
-                                        color: const Color(0xFF4A90E2).withOpacity(0.1),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ]
-                                  : [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
+                                boxShadow: _cpfFocused
+                                    ? [
+                                        BoxShadow(
+                                          color: const Color(0xFF4A90E2)
+                                              .withOpacity(0.1),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                    : [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.05),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
                               ),
                               child: Focus(
                                 onFocusChange: (hasFocus) {
@@ -378,11 +408,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly,
                                     LengthLimitingTextInputFormatter(11),
-                                    TextInputFormatter.withFunction((oldValue, newValue) {
-                                      final formatted = _formatCPF(newValue.text);
+                                    TextInputFormatter.withFunction(
+                                        (oldValue, newValue) {
+                                      final formatted =
+                                          _formatCPF(newValue.text);
                                       return TextEditingValue(
                                         text: formatted,
-                                        selection: TextSelection.collapsed(offset: formatted.length),
+                                        selection: TextSelection.collapsed(
+                                            offset: formatted.length),
                                       );
                                     }),
                                   ],
@@ -400,9 +433,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     ),
                                     prefixIcon: Icon(
                                       Icons.badge_outlined,
-                                      color: _cpfFocused 
-                                        ? const Color(0xFF4A90E2)
-                                        : Colors.grey[500],
+                                      color: _cpfFocused
+                                          ? const Color(0xFF4A90E2)
+                                          : Colors.grey[500],
                                       size: isVerySmallScreen ? 20 : 22,
                                     ),
                                     border: InputBorder.none,
@@ -426,9 +459,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               ),
                             ),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 10 : 14),
-                            
+
                             // Campo E-mail do responsável
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
@@ -436,26 +469,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 color: const Color(0xFFF8F9FA),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: _emailFocused 
-                                    ? const Color(0xFF4A90E2)
-                                    : Colors.transparent,
+                                  color: _emailFocused
+                                      ? const Color(0xFF4A90E2)
+                                      : Colors.transparent,
                                   width: 2,
                                 ),
-                                boxShadow: _emailFocused 
-                                  ? [
-                                      BoxShadow(
-                                        color: const Color(0xFF4A90E2).withOpacity(0.1),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ]
-                                  : [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
+                                boxShadow: _emailFocused
+                                    ? [
+                                        BoxShadow(
+                                          color: const Color(0xFF4A90E2)
+                                              .withOpacity(0.1),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                    : [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.05),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
                               ),
                               child: Focus(
                                 onFocusChange: (hasFocus) {
@@ -480,9 +514,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     ),
                                     prefixIcon: Icon(
                                       Icons.email_outlined,
-                                      color: _emailFocused 
-                                        ? const Color(0xFF4A90E2)
-                                        : Colors.grey[500],
+                                      color: _emailFocused
+                                          ? const Color(0xFF4A90E2)
+                                          : Colors.grey[500],
                                       size: isVerySmallScreen ? 20 : 22,
                                     ),
                                     border: InputBorder.none,
@@ -498,7 +532,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     if (value == null || value.isEmpty) {
                                       return 'Por favor, insira o e-mail do responsável';
                                     }
-                                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                    if (!RegExp(
+                                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                                         .hasMatch(value)) {
                                       return 'Por favor, insira um e-mail válido';
                                     }
@@ -507,9 +542,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               ),
                             ),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 10 : 14),
-                            
+
                             // Campo Senha
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
@@ -517,26 +552,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 color: const Color(0xFFF8F9FA),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: _passwordFocused 
-                                    ? const Color(0xFF4A90E2)
-                                    : Colors.transparent,
+                                  color: _passwordFocused
+                                      ? const Color(0xFF4A90E2)
+                                      : Colors.transparent,
                                   width: 2,
                                 ),
-                                boxShadow: _passwordFocused 
-                                  ? [
-                                      BoxShadow(
-                                        color: const Color(0xFF4A90E2).withOpacity(0.1),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ]
-                                  : [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
+                                boxShadow: _passwordFocused
+                                    ? [
+                                        BoxShadow(
+                                          color: const Color(0xFF4A90E2)
+                                              .withOpacity(0.1),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                    : [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.05),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
                               ),
                               child: Focus(
                                 onFocusChange: (hasFocus) {
@@ -561,9 +597,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     ),
                                     prefixIcon: Icon(
                                       Icons.lock_outline,
-                                      color: _passwordFocused 
-                                        ? const Color(0xFF4A90E2)
-                                        : Colors.grey[500],
+                                      color: _passwordFocused
+                                          ? const Color(0xFF4A90E2)
+                                          : Colors.grey[500],
                                       size: isVerySmallScreen ? 20 : 22,
                                     ),
                                     border: InputBorder.none,
@@ -576,14 +612,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         _isPasswordVisible
                                             ? Icons.visibility_outlined
                                             : Icons.visibility_off_outlined,
-                                        color: _passwordFocused 
-                                          ? const Color(0xFF4A90E2)
-                                          : Colors.grey[500],
+                                        color: _passwordFocused
+                                            ? const Color(0xFF4A90E2)
+                                            : Colors.grey[500],
                                         size: isVerySmallScreen ? 20 : 22,
                                       ),
                                       onPressed: () {
                                         setState(() {
-                                          _isPasswordVisible = !_isPasswordVisible;
+                                          _isPasswordVisible =
+                                              !_isPasswordVisible;
                                         });
                                       },
                                     ),
@@ -603,9 +640,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               ),
                             ),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 10 : 14),
-                            
+
                             // Campo Confirmar Senha
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
@@ -613,26 +650,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 color: const Color(0xFFF8F9FA),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: _confirmPasswordFocused 
-                                    ? const Color(0xFF4A90E2)
-                                    : Colors.transparent,
+                                  color: _confirmPasswordFocused
+                                      ? const Color(0xFF4A90E2)
+                                      : Colors.transparent,
                                   width: 2,
                                 ),
-                                boxShadow: _confirmPasswordFocused 
-                                  ? [
-                                      BoxShadow(
-                                        color: const Color(0xFF4A90E2).withOpacity(0.1),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ]
-                                  : [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
+                                boxShadow: _confirmPasswordFocused
+                                    ? [
+                                        BoxShadow(
+                                          color: const Color(0xFF4A90E2)
+                                              .withOpacity(0.1),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                    : [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.05),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
                               ),
                               child: Focus(
                                 onFocusChange: (hasFocus) {
@@ -657,9 +695,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     ),
                                     prefixIcon: Icon(
                                       Icons.lock_outline,
-                                      color: _confirmPasswordFocused 
-                                        ? const Color(0xFF4A90E2)
-                                        : Colors.grey[500],
+                                      color: _confirmPasswordFocused
+                                          ? const Color(0xFF4A90E2)
+                                          : Colors.grey[500],
                                       size: isVerySmallScreen ? 20 : 22,
                                     ),
                                     border: InputBorder.none,
@@ -672,14 +710,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         _isConfirmPasswordVisible
                                             ? Icons.visibility_outlined
                                             : Icons.visibility_off_outlined,
-                                        color: _confirmPasswordFocused 
-                                          ? const Color(0xFF4A90E2)
-                                          : Colors.grey[500],
+                                        color: _confirmPasswordFocused
+                                            ? const Color(0xFF4A90E2)
+                                            : Colors.grey[500],
                                         size: isVerySmallScreen ? 20 : 22,
                                       ),
                                       onPressed: () {
                                         setState(() {
-                                          _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                                          _isConfirmPasswordVisible =
+                                              !_isConfirmPasswordVisible;
                                         });
                                       },
                                     ),
@@ -699,9 +738,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               ),
                             ),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 15 : 20),
-                            
+
                             // Botão Avançar com gradiente
                             Container(
                               width: double.infinity,
@@ -713,10 +752,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     Color(0xFFFF7A28),
                                   ],
                                 ),
-                                borderRadius: BorderRadius.circular(isVerySmallScreen ? 25 : 28),
+                                borderRadius: BorderRadius.circular(
+                                    isVerySmallScreen ? 25 : 28),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFFF8C42).withOpacity(0.3),
+                                    color: const Color(0xFFFF8C42)
+                                        .withOpacity(0.3),
                                     blurRadius: 12,
                                     offset: const Offset(0, 4),
                                   ),
@@ -730,7 +771,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   elevation: 0,
                                   shadowColor: Colors.transparent,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(isVerySmallScreen ? 25 : 28),
+                                    borderRadius: BorderRadius.circular(
+                                        isVerySmallScreen ? 25 : 28),
                                   ),
                                 ),
                                 child: _isLoading
@@ -739,7 +781,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         width: isVerySmallScreen ? 18 : 20,
                                         child: const CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
                                             Colors.white,
                                           ),
                                         ),
@@ -753,9 +796,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       ),
                               ),
                             ),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 15 : 20),
-                            
+
                             // Link para fazer login
                             Center(
                               child: GestureDetector(
@@ -786,7 +829,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               ),
                             ),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 15 : 20),
                           ],
                         ),
@@ -808,23 +851,27 @@ class FormTopClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    
+
     path.moveTo(0, size.height);
     path.lineTo(size.width, size.height);
     path.lineTo(size.width, 60);
-    
+
     path.quadraticBezierTo(
-      size.width * 0.75, 20,
-      size.width * 0.5, 20,
+      size.width * 0.75,
+      20,
+      size.width * 0.5,
+      20,
     );
-    
+
     path.quadraticBezierTo(
-      size.width * 0.25, 20,
-      0, 60,
+      size.width * 0.25,
+      20,
+      0,
+      60,
     );
-    
+
     path.close();
-    
+
     return path;
   }
 

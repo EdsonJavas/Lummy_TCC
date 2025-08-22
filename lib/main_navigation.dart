@@ -5,7 +5,7 @@ import 'expenses_screen.dart'; // Importando a tela de gastos
 import 'lessons_screen.dart'; // Importando a nova LessonsScreen estilizada
 
 class MainNavigation extends StatefulWidget {
-  const MainNavigation({Key? key}) : super(key: key);
+  const MainNavigation({super.key});
 
   @override
   State<MainNavigation> createState() => _MainNavigationState();
@@ -44,10 +44,18 @@ class _MainNavigationState extends State<MainNavigation> {
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Row(
               children: [
-                Expanded(child: _buildNavItem(0, Icons.home_rounded, 'Início', const Color(0xFF1E40AF))),
-                Expanded(child: _buildNavItem(1, Icons.receipt_long_rounded, 'Gastos', const Color(0xFFEF4444))),
-                Expanded(child: _buildNavItem(2, Icons.flag_rounded, 'Metas', const Color(0xFF8B5CF6))),
-                Expanded(child: _buildNavItem(3, Icons.school_rounded, 'Aprender', const Color(0xFF10B981))),
+                Expanded(
+                    child: _buildNavItem(0, Icons.home_rounded, 'Início',
+                        const Color(0xFF1E40AF))),
+                Expanded(
+                    child: _buildNavItem(1, Icons.receipt_long_rounded,
+                        'Gastos', const Color(0xFFEF4444))),
+                Expanded(
+                    child: _buildNavItem(2, Icons.flag_rounded, 'Metas',
+                        const Color(0xFF8B5CF6))),
+                Expanded(
+                    child: _buildNavItem(3, Icons.school_rounded, 'Aprender',
+                        const Color(0xFF10B981))),
               ],
             ),
           ),
@@ -58,7 +66,7 @@ class _MainNavigationState extends State<MainNavigation> {
 
   Widget _buildNavItem(int index, IconData icon, String label, Color color) {
     final isSelected = _currentIndex == index;
-    
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -185,7 +193,7 @@ class TransactionsPage extends StatelessWidget {
 }
 
 class GoalsPage extends StatelessWidget {
-  const GoalsPage({Key? key}) : super(key: key);
+  const GoalsPage({super.key});
 
   @override
   Widget build(BuildContext context) {

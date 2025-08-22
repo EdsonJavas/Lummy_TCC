@@ -2,22 +2,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'responsavel_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterChildrenScreen extends StatefulWidget {
-  const RegisterChildrenScreen({Key? key}) : super(key: key);
+  final Responsavel responsavel;
 
+  const RegisterChildrenScreen({super.key, required this.responsavel});
   @override
   State<RegisterChildrenScreen> createState() => _RegisterChildrenScreenState();
 }
 
-class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with TickerProviderStateMixin {
+class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
+    with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _cpfController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _ageController = TextEditingController();
-  
+
   String _selectedGender = '';
   bool _isPasswordVisible = false;
   bool _isLoading = false;
@@ -26,7 +30,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
   bool _emailFocused = false;
   bool _passwordFocused = false;
   bool _ageFocused = false;
-  
+
+  String? _responsavelId; // 🔹 Para guardar o ID do responsável no Firestore
+
   late AnimationController _animationController;
   late Animation<double> _bounceAnimation;
   late AnimationController _starAnimationController;
@@ -35,6 +41,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
   @override
   void initState() {
     super.initState();
+    _criarResponsavelNoFirestore(); // 🔹 cria o responsável assim que entra na tela
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -42,15 +49,16 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
     _bounceAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
     );
-    
+
     _starAnimationController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     )..repeat();
     _starAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _starAnimationController, curve: Curves.easeInOut),
+      CurvedAnimation(
+          parent: _starAnimationController, curve: Curves.easeInOut),
     );
-    
+
     _animationController.forward();
   }
 
@@ -71,7 +79,8 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
     cpf = cpf.replaceAll(RegExp(r'[^0-9]'), '');
     if (cpf.length <= 3) return cpf;
     if (cpf.length <= 6) return '${cpf.substring(0, 3)}.${cpf.substring(3)}';
-    if (cpf.length <= 9) return '${cpf.substring(0, 3)}.${cpf.substring(3, 6)}.${cpf.substring(6)}';
+    if (cpf.length <= 9)
+      return '${cpf.substring(0, 3)}.${cpf.substring(3, 6)}.${cpf.substring(6)}';
     return '${cpf.substring(0, 3)}.${cpf.substring(3, 6)}.${cpf.substring(6, 9)}-${cpf.substring(9, 11)}';
   }
 
@@ -98,47 +107,203 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
     return digit1 == int.parse(cpf[9]) && digit2 == int.parse(cpf[10]);
   }
 
-  Future<void> _handleRegisterChild() async {
-    if (_formKey.currentState!.validate() && _selectedGender.isNotEmpty) {
-      setState(() {
-        _isLoading = true;
+  Future<void> _criarResponsavelNoFirestore() async {
+    final firestore = FirebaseFirestore.instance;
+    try {
+      final docRef = await firestore.collection("responsaveis").add({
+        "nome": widget.responsavel.nome,
+        "cpf": widget.responsavel.cpf,
+        "email": widget.responsavel.email,
+        "senha": widget.responsavel.senha, // ⚠️ não recomendado texto plano
+        "createdAt": FieldValue.serverTimestamp(),
       });
 
-      await Future.delayed(const Duration(seconds: 2));
-
       setState(() {
-        _isLoading = false;
+        _responsavelId = docRef.id;
       });
-
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Text('🎉 '),
-              const Text('Criança cadastrada com sucesso!'),
-            ],
-          ),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        ),
-      );
-    } else if (_selectedGender.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Por favor, selecione o sexo da criança'),
-          backgroundColor: Colors.orange,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        ),
+        SnackBar(content: Text("Erro ao criar responsável: $e")),
       );
     }
   }
 
+  // 🔹 Agora o método principal volta a se chamar _handleRegisterChild
+  Future<void> _handleRegisterChild() async {
+    if (_formKey.currentState!.validate()) {
+      if (_selectedGender.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Selecione o sexo da criança")),
+        );
+        return;
+      }
+
+      if (_responsavelId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Responsável ainda não foi criado")),
+        );
+        return;
+      }
+
+      setState(() => _isLoading = true);
+
+      try {
+        await FirebaseFirestore.instance
+            .collection("responsaveis")
+            .doc(_responsavelId)
+            .collection("children")
+            .add({
+          "nome": _nameController.text.trim(),
+          "cpf": _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+          "email": _emailController.text.trim(),
+          "senha": _passwordController.text, // ⚠️ idem
+          "idade": int.tryParse(_ageController.text.trim()) ?? 0,
+          "sexo": _selectedGender,
+          "createdAt": FieldValue.serverTimestamp(),
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("🎉 Criança adicionada com sucesso!")),
+        );
+
+        // 🔹 limpar formulário
+        _formKey.currentState?.reset();
+        _nameController.clear();
+        _cpfController.clear();
+        _emailController.clear();
+        _passwordController.clear();
+        _ageController.clear();
+        setState(() {
+          _selectedGender = '';
+        });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erro ao adicionar criança: $e")),
+        );
+      }
+
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _finalizarCadastro() {
+    Navigator.pop(context); // ou push para home/dashboard
+  }
+
+  // Future<void> _handleRegisterChild() async {
+  //   if (_formKey.currentState!.validate()) {
+  //     if (_selectedGender.isEmpty) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: const Text('Por favor, selecione o sexo da criança'),
+  //           backgroundColor: Colors.orange,
+  //           behavior: SnackBarBehavior.floating,
+  //           shape:
+  //               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+  //         ),
+  //       );
+  //       return;
+  //     }
+
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+
+  //     try {
+  //       final firestore = FirebaseFirestore.instance;
+
+  //       // 🔹 1. Criar documento do responsável
+  //       final responsavelRef = await firestore.collection("responsaveis").add({
+  //         "nome": widget.responsavel.nome,
+  //         "cpf": widget.responsavel.cpf,
+  //         "email": widget.responsavel.email,
+  //         "senha": widget
+  //             .responsavel.senha, // ⚠️ não recomendado salvar em texto plano
+  //         "createdAt": FieldValue.serverTimestamp(),
+  //       });
+
+  //       // 🔹 2. Criar documento da criança dentro de "children"
+  //       await firestore
+  //           .collection("responsaveis")
+  //           .doc(responsavelRef.id)
+  //           .collection("children")
+  //           .add({
+  //         "nome": _nameController.text.trim(),
+  //         "cpf": _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+  //         "email": _emailController.text.trim(),
+  //         "senha": _passwordController.text, // ⚠️ idem
+  //         "idade": int.tryParse(_ageController.text.trim()) ?? 0,
+  //         "sexo": _selectedGender,
+  //         "createdAt": FieldValue.serverTimestamp(),
+  //       });
+
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content:
+  //               const Text('🎉 Responsável e criança cadastrados com sucesso!'),
+  //           backgroundColor: Colors.green,
+  //           behavior: SnackBarBehavior.floating,
+  //           shape:
+  //               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+  //         ),
+  //       );
+
+  //       // 🔹 Se quiser limpar os campos da criança
+  //       _nameController.clear();
+  //       _cpfController.clear();
+  //       _emailController.clear();
+  //       _passwordController.clear();
+  //       _ageController.clear();
+  //       setState(() {
+  //         _selectedGender = '';
+  //       });
+
+  //       // 🔹 Pode navegar para próxima tela
+  //       Navigator.pop(context); // ou push para home/dashboard
+  //     } catch (e) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text('Erro ao salvar: $e'),
+  //           backgroundColor: Colors.red,
+  //         ),
+  //       );
+  //     }
+
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //   }
+
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Row(
+  //         children: [
+  //           const Text('🎉 '),
+  //           const Text('Criança cadastrada com sucesso!'),
+  //         ],
+  //       ),
+  //       backgroundColor: Colors.green,
+  //       behavior: SnackBarBehavior.floating,
+  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+  //     ),
+  //   );
+  //   if (_selectedGender.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: const Text('Por favor, selecione o sexo da criança'),
+  //         backgroundColor: Colors.orange,
+  //         behavior: SnackBarBehavior.floating,
+  //         shape:
+  //             RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+  //       ),
+  //     );
+  //   }
+  // }
+
   Widget _buildGenderSelector() {
     final screenHeight = MediaQuery.of(context).size.height;
     final isVerySmallScreen = screenHeight < 650;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -169,7 +334,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                             colors: [Color(0xFF4FC3F7), Color(0xFF29B6F6)],
                           )
                         : null,
-                    color: _selectedGender == 'Masculino' ? null : const Color(0xFFF8F9FA),
+                    color: _selectedGender == 'Masculino'
+                        ? null
+                        : const Color(0xFFF8F9FA),
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(
                       color: _selectedGender == 'Masculino'
@@ -226,7 +393,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                             colors: [Color(0xFFFF8A95), Color(0xFFFF6B7A)],
                           )
                         : null,
-                    color: _selectedGender == 'Feminino' ? null : const Color(0xFFF8F9FA),
+                    color: _selectedGender == 'Feminino'
+                        ? null
+                        : const Color(0xFFF8F9FA),
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(
                       color: _selectedGender == 'Feminino'
@@ -287,7 +456,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
   }) {
     final screenHeight = MediaQuery.of(context).size.height;
     final isVerySmallScreen = screenHeight < 650;
-    
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
@@ -299,26 +468,24 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
         color: isFocused ? null : const Color(0xFFF8F9FA),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: isFocused 
-            ? const Color(0xFFFF8C42)
-            : Colors.transparent,
+          color: isFocused ? const Color(0xFFFF8C42) : Colors.transparent,
           width: 2,
         ),
-        boxShadow: isFocused 
-          ? [
-              BoxShadow(
-                color: const Color(0xFFFF8C42).withOpacity(0.2),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ]
-          : [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
+        boxShadow: isFocused
+            ? [
+                BoxShadow(
+                  color: const Color(0xFFFF8C42).withOpacity(0.2),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: Focus(
         onFocusChange: onFocusChange,
@@ -342,9 +509,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
             ),
             prefixIcon: Icon(
               icon,
-              color: isFocused 
-                ? const Color(0xFFFF8C42)
-                : Colors.grey[500],
+              color: isFocused ? const Color(0xFFFF8C42) : Colors.grey[500],
               size: isVerySmallScreen ? 20 : 22,
             ),
             suffixIcon: suffixIcon,
@@ -368,10 +533,10 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-    
+
     final isVerySmallScreen = screenHeight < 650;
     final isSmallScreen = screenHeight < 700;
-    
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
@@ -399,7 +564,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                   ),
                 ),
               ),
-              
+
               // Estrelas animadas no fundo
               ...List.generate(8, (index) {
                 return AnimatedBuilder(
@@ -408,13 +573,19 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                     final offset = (_starAnimation.value + index * 0.2) % 1.0;
                     return Positioned(
                       top: (screenHeight * 0.1) + (index * 80) + (offset * 50),
-                      left: (index % 2 == 0) 
-                        ? screenWidth * 0.1 + (offset * 30)
-                        : screenWidth * 0.8 + (offset * 30),
+                      left: (index % 2 == 0)
+                          ? screenWidth * 0.1 + (offset * 30)
+                          : screenWidth * 0.8 + (offset * 30),
                       child: Transform.rotate(
                         angle: _starAnimation.value * 6.28,
                         child: Text(
-                          index % 4 == 0 ? '⭐' : index % 4 == 1 ? '🌟' : index % 4 == 2 ? '✨' : '💫',
+                          index % 4 == 0
+                              ? '⭐'
+                              : index % 4 == 1
+                                  ? '🌟'
+                                  : index % 4 == 2
+                                      ? '✨'
+                                      : '💫',
                           style: TextStyle(
                             fontSize: isVerySmallScreen ? 16 : 20,
                           ),
@@ -424,12 +595,12 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                   },
                 );
               }),
-              
+
               // Logo no topo
               SafeArea(
                 child: Padding(
                   padding: EdgeInsets.only(
-                    left: 24.0, 
+                    left: 24.0,
                     top: isVerySmallScreen ? 10 : 20,
                   ),
                   child: Row(
@@ -492,10 +663,12 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                   ),
                 ),
               ),
-              
+
               // Personagem infantil animado
               Positioned(
-                top: isVerySmallScreen ? screenHeight * 0.08 : screenHeight * 0.10,
+                top: isVerySmallScreen
+                    ? screenHeight * 0.08
+                    : screenHeight * 0.10,
                 left: screenWidth * 0.2,
                 right: screenWidth * 0.2,
                 child: AnimatedBuilder(
@@ -505,8 +678,12 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                       scale: _bounceAnimation.value,
                       child: Center(
                         child: Container(
-                          height: isVerySmallScreen ? 200 : (isSmallScreen ? 250 : 300),
-                          width: isVerySmallScreen ? 200 : (isSmallScreen ? 250 : 300),
+                          height: isVerySmallScreen
+                              ? 200
+                              : (isSmallScreen ? 250 : 300),
+                          width: isVerySmallScreen
+                              ? 200
+                              : (isSmallScreen ? 250 : 300),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.9),
                             borderRadius: BorderRadius.circular(150),
@@ -522,7 +699,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                             child: Text(
                               '👶',
                               style: TextStyle(
-                                fontSize: isVerySmallScreen ? 80 : (isSmallScreen ? 100 : 120),
+                                fontSize: isVerySmallScreen
+                                    ? 80
+                                    : (isSmallScreen ? 100 : 120),
                               ),
                             ),
                           ),
@@ -532,7 +711,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                   },
                 ),
               ),
-              
+
               // Formulário na parte inferior
               Positioned(
                 bottom: 0,
@@ -542,8 +721,12 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                   clipper: FormTopClipper(),
                   child: Container(
                     constraints: BoxConstraints(
-                      minHeight: isVerySmallScreen ? screenHeight * 0.7 : screenHeight * 0.65,
-                      maxHeight: isVerySmallScreen ? screenHeight * 0.9 : screenHeight * 0.85,
+                      minHeight: isVerySmallScreen
+                          ? screenHeight * 0.7
+                          : screenHeight * 0.65,
+                      maxHeight: isVerySmallScreen
+                          ? screenHeight * 0.9
+                          : screenHeight * 0.85,
                     ),
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -561,7 +744,8 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                         left: isVerySmallScreen ? 20.0 : 24.0,
                         right: isVerySmallScreen ? 20.0 : 24.0,
                         top: isVerySmallScreen ? 20.0 : 24.0,
-                        bottom: (isVerySmallScreen ? 20.0 : 24.0) + keyboardHeight,
+                        bottom:
+                            (isVerySmallScreen ? 20.0 : 24.0) + keyboardHeight,
                       ),
                       child: Form(
                         key: _formKey,
@@ -569,14 +753,18 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(height: isVerySmallScreen ? 15 : (isSmallScreen ? 25 : 35)),
-                            
+                            SizedBox(
+                                height: isVerySmallScreen
+                                    ? 15
+                                    : (isSmallScreen ? 25 : 35)),
+
                             // Título com emoji
                             Row(
                               children: [
                                 Text(
                                   '🎈 ',
-                                  style: TextStyle(fontSize: isVerySmallScreen ? 24 : 28),
+                                  style: TextStyle(
+                                      fontSize: isVerySmallScreen ? 24 : 28),
                                 ),
                                 Text(
                                   'Cadastrar Criança',
@@ -588,9 +776,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                                 ),
                               ],
                             ),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 15 : 20),
-                            
+
                             // Campo Nome
                             _buildAnimatedInputField(
                               controller: _nameController,
@@ -613,14 +801,14 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                                 return null;
                               },
                             ),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 10 : 14),
-                            
+
                             // Seletor de sexo
                             _buildGenderSelector(),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 10 : 14),
-                            
+
                             // Campo Idade
                             _buildAnimatedInputField(
                               controller: _ageController,
@@ -648,9 +836,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                                 return null;
                               },
                             ),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 10 : 14),
-                            
+
                             // Campo CPF
                             _buildAnimatedInputField(
                               controller: _cpfController,
@@ -661,11 +849,13 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
                                 LengthLimitingTextInputFormatter(11),
-                                TextInputFormatter.withFunction((oldValue, newValue) {
+                                TextInputFormatter.withFunction(
+                                    (oldValue, newValue) {
                                   final formatted = _formatCPF(newValue.text);
                                   return TextEditingValue(
                                     text: formatted,
-                                    selection: TextSelection.collapsed(offset: formatted.length),
+                                    selection: TextSelection.collapsed(
+                                        offset: formatted.length),
                                   );
                                 }),
                               ],
@@ -684,9 +874,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                                 return null;
                               },
                             ),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 10 : 14),
-                            
+
                             // Campo E-mail
                             _buildAnimatedInputField(
                               controller: _emailController,
@@ -710,9 +900,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                                 return null;
                               },
                             ),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 10 : 14),
-                            
+
                             // Campo Senha
                             _buildAnimatedInputField(
                               controller: _passwordController,
@@ -730,9 +920,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                                   _isPasswordVisible
                                       ? Icons.visibility
                                       : Icons.visibility_off,
-                                  color: _passwordFocused 
-                                    ? const Color(0xFFFF8C42)
-                                    : Colors.grey[500],
+                                  color: _passwordFocused
+                                      ? const Color(0xFFFF8C42)
+                                      : Colors.grey[500],
                                   size: isVerySmallScreen ? 20 : 22,
                                 ),
                                 onPressed: () {
@@ -751,9 +941,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                                 return null;
                               },
                             ),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 20 : 25),
-                            
+
                             // Botão Cadastrar Criança
                             Container(
                               width: double.infinity,
@@ -766,24 +956,28 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                                     Color(0xFF4FC3F7),
                                   ],
                                 ),
-                                borderRadius: BorderRadius.circular(isVerySmallScreen ? 25 : 28),
+                                borderRadius: BorderRadius.circular(
+                                    isVerySmallScreen ? 25 : 28),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFFF8C42).withOpacity(0.4),
+                                    color: const Color(0xFFFF8C42)
+                                        .withOpacity(0.4),
                                     blurRadius: 15,
                                     offset: const Offset(0, 6),
                                   ),
                                 ],
                               ),
                               child: ElevatedButton(
-                                onPressed: _isLoading ? null : _handleRegisterChild,
+                                onPressed:
+                                    _isLoading ? null : _handleRegisterChild,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.transparent,
                                   foregroundColor: Colors.white,
                                   elevation: 0,
                                   shadowColor: Colors.transparent,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(isVerySmallScreen ? 25 : 28),
+                                    borderRadius: BorderRadius.circular(
+                                        isVerySmallScreen ? 25 : 28),
                                   ),
                                 ),
                                 child: _isLoading
@@ -792,22 +986,28 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                                         width: isVerySmallScreen ? 18 : 20,
                                         child: const CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
                                             Colors.white,
                                           ),
                                         ),
                                       )
                                     : Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           Text(
                                             '🎉 ',
-                                            style: TextStyle(fontSize: isVerySmallScreen ? 16 : 18),
+                                            style: TextStyle(
+                                                fontSize: isVerySmallScreen
+                                                    ? 16
+                                                    : 18),
                                           ),
                                           Text(
                                             'Cadastrar Criança',
                                             style: GoogleFonts.poppins(
-                                              fontSize: isVerySmallScreen ? 16 : 18,
+                                              fontSize:
+                                                  isVerySmallScreen ? 16 : 18,
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
@@ -815,14 +1015,16 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                                       ),
                               ),
                             ),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 15 : 20),
-                            
+
                             // Botão para adicionar mais crianças
                             Center(
                               child: TextButton(
-                                onPressed: () {
-                                  // Limpar formulário para adicionar outra criança
+                                onPressed: () async {
+                                  await _handleRegisterChild(); // 🔹 salva no Firestore
+
+                                  // 🔹 se quiser limpar manualmente além do que já tem no método
                                   _formKey.currentState?.reset();
                                   _nameController.clear();
                                   _cpfController.clear();
@@ -838,7 +1040,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                                   children: [
                                     Text(
                                       '➕ ',
-                                      style: TextStyle(fontSize: isVerySmallScreen ? 14 : 16),
+                                      style: TextStyle(
+                                          fontSize:
+                                              isVerySmallScreen ? 14 : 16),
                                     ),
                                     Text(
                                       'Adicionar outra criança',
@@ -852,7 +1056,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen> with Ti
                                 ),
                               ),
                             ),
-                            
+
                             SizedBox(height: isVerySmallScreen ? 15 : 20),
                           ],
                         ),
@@ -873,23 +1077,27 @@ class FormTopClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    
+
     path.moveTo(0, size.height);
     path.lineTo(size.width, size.height);
     path.lineTo(size.width, 60);
-    
+
     path.quadraticBezierTo(
-      size.width * 0.75, 20,
-      size.width * 0.5, 20,
+      size.width * 0.75,
+      20,
+      size.width * 0.5,
+      20,
     );
-    
+
     path.quadraticBezierTo(
-      size.width * 0.25, 20,
-      0, 60,
+      size.width * 0.25,
+      20,
+      0,
+      60,
     );
-    
+
     path.close();
-    
+
     return path;
   }
 
