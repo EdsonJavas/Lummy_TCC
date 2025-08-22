@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'home_page.dart';
+import 'home_page.dart'; // HomePage agora é importada do arquivo separado
 import 'expenses_screen.dart'; // Importando a tela de gastos
 import 'lessons_screen.dart'; // Importando a nova LessonsScreen estilizada
 
